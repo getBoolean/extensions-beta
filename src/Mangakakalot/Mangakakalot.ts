@@ -8,7 +8,7 @@ export class Mangakakalot extends Source {
     super(cheerio)
   }
 
-  get version(): string { return '0.1.3'; }
+  get version(): string { return '0.1.4'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -321,59 +321,85 @@ export class Mangakakalot extends Source {
     return tagSections
   }
 
-  getHomePageSectionRequest(): HomeSectionRequest[] | null {
-    let request = createRequestObject({ url: `${MK_DOMAIN}`, method: 'GET' })
-    let section1 = createHomeSection({ id: 'hot_update', title: 'POPULAR MANGA' })
-    let section2 = createHomeSection({ id: 'latest', title: 'LATEST MANGA RELEASES' })
+  private constructGetViewMoreRequest(key: string, page: number) {
+    let metadata = { page: page }
+    let param = ''
+    switch (key) {
+      case 'latest_updates': {
+        param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`
+        break
+      }
+      case 'new_manga': {
+        param = `/manga_list?type=newest&category=all&state=all&page=${metadata.page}`
+        break
+      }
+      default: return undefined
+    }
 
-    return [createHomeSectionRequest({ request: request, sections: [section1, section2] })]
+    return createRequestObject({
+      url: `${MK_DOMAIN}`,
+      method: 'GET',
+      param: param,
+      metadata: {
+        key, page
+      }
+    })
+  }
+
+  getHomePageSectionRequest(): HomeSectionRequest[] | null {
+    let request = createRequestObject({ url: `${MK_DOMAIN}`, method: 'GET', })
+    let section1 = createHomeSection({ id: 'top_week', title: 'POPULAR MANGA' })
+    let section2 = createHomeSection({ id: 'latest_updates', title: 'LATEST MANGA RELEASES', view_more: this.constructGetViewMoreRequest('latest_updates', 1) })
+    let section3 = createHomeSection({ id: 'new_manga', title: 'NEW MANGA', view_more: this.constructGetViewMoreRequest('new_manga', 1) })
+    return [createHomeSectionRequest({ request: request, sections: [section1, section2, section3] })]
   }
 
   getHomePageSections(data: any, sections: HomeSection[]): HomeSection[] {
-    let $ = this.cheerio.load(data);
-    let hot = (JSON.parse((data.match(/owl-item = (.*);/) ?? [])[1])).slice(0, 15)
-    let latest = (JSON.parse((data.match(/itemupdate first = (.*);/) ?? [])[1])).slice(0, 15)
+    let $ = this.cheerio.load(data)
+    let topManga: MangaTile[] = []
+    let updateManga: MangaTile[] = []
+    let newManga: MangaTile[] = []
 
-    let imgSource = ($('.ImageHolder').html()?.match(/src="(.*)\//) ?? [])[1];
-    if (imgSource !== MK_IMAGE_DOMAIN)
-      MK_IMAGE_DOMAIN = imgSource;
-
-    let hotManga: MangaTile[] = []
-    hot.forEach((elem: any) => {
-      let id = elem.IndexName
-      let title = elem.SeriesName
-      let image = `${MK_IMAGE_DOMAIN}/${id}.jpg`
-      let time = (new Date(elem.Date)).toDateString()
-      time = time.slice(0, time.length - 5)
-      time = time.slice(4, time.length)
-
-      hotManga.push(createMangaTile({
+    for (let item of $('.item', '.owl-carousel').toArray()) {
+      let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
+      let image = $('img', item).attr('src') ?? ''
+      topManga.push(createMangaTile({
         id: id,
         image: image,
-        title: createIconText({ text: title }),
-        secondaryText: createIconText({ text: time, icon: 'clock.fill' })
+        title: createIconText({ text: $('a', item).first().text() }),
+        subtitleText: createIconText({ text: $('[rel=nofollow]', item).text() })
       }))
-    })
+    }
 
-    let latestManga: MangaTile[] = []
-    latest.forEach((elem: any) => {
-      let id = elem.IndexName
-      let title = elem.SeriesName
-      let image = `${MK_IMAGE_DOMAIN}/${id}.jpg`
-      let time = (new Date(elem.Date)).toDateString()
-      time = time.slice(0, time.length - 5)
-      time = time.slice(4, time.length)
-
-      latestManga.push(createMangaTile({
+    for (let item of $('.content-homepage-item', '.panel-content-homepage').toArray()) {
+      let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
+      let image = $('img', item).attr('src') ?? ''
+      let itemRight = $('.content-homepage-item-right', item)
+      let latestUpdate = $('.item-chapter', itemRight).first()
+      updateManga.push(createMangaTile({
         id: id,
         image: image,
-        title: createIconText({ text: title }),
-        secondaryText: createIconText({ text: time, icon: 'clock.fill' })
+        title: createIconText({ text: $('a', itemRight).first().text() }),
+        subtitleText: createIconText({ text: $('.item-author', itemRight).text() }),
+        primaryText: createIconText({ text: $('.genres-item-rate', item).text(), icon: 'star.fill' }),
+        secondaryText: createIconText({ text: $('i', latestUpdate).text(), icon: 'clock.fill' })
       }))
-    })
+    }
 
-    sections[0].items = hotManga
-    sections[1].items = latestManga
+    for (let item of $('a', '.panel-newest-content').toArray()) {
+      let id = $(item).attr('href')?.split('/').pop() ?? ''
+      let image = $('img', item).attr('src') ?? ''
+      let title = $('img', item).attr('alt') ?? ''
+      newManga.push(createMangaTile({
+        id: id,
+        image: image,
+        title: createIconText({ text: title })
+      }))
+    }
+
+    sections[0].items = topManga
+    sections[1].items = updateManga
+    sections[2].items = newManga
     return sections
   }
 
