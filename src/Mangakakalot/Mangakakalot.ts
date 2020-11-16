@@ -8,7 +8,7 @@ export class Mangakakalot extends Source {
     super(cheerio)
   }
 
-  get version(): string { return '0.1.9'; }
+  get version(): string { return '0.0.13'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -410,10 +410,10 @@ export class Mangakakalot extends Source {
     if (key == 'latest_updates') {
       let panel = $('.truyen-list')
       for (let item of $('.list-truyen-item-wrap', panel).toArray()) {
-        let id = ($('a', item).first().attr('href') ?? '').split('/').pop() ?? ''
-        let image = $('img', item).attr('src') ?? ''
-        let title = $('a', item).attr('title') ?? ''
-        let subtitle = $('.list-story-item-wrap-chapter', item).text()
+        let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
+        let image = $('img', item).first().attr('src') ?? ''
+        let title = $('a', item).first().attr('title') ?? ''
+        let subtitle = $('.list-story-item-wrap-chapter', item).attr('title') ?? ''
         manga.push(createMangaTile({
           id: id,
           image: image,
