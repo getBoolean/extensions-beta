@@ -2711,21 +2711,17 @@ class MangaDex extends paperback_extensions_common_1.Source {
             })];
     }
     getMangaDetails(data, metadata) {
-        var _a;
         let result = JSON.parse(data);
         let mangas = [];
         for (let mangaDetails of result["result"]) {
             mangas.push(createManga({
                 id: mangaDetails["id"].toString(),
                 titles: mangaDetails["titles"],
-                image: (_a = mangaDetails["image"]) !== null && _a !== void 0 ? _a : "https://mangadex.org/images/avatars/default1.jpg",
+                image: mangaDetails["image"],
                 rating: mangaDetails["rating"],
                 status: mangaDetails["status"],
-                langFlag: mangaDetails["langFlag"],
-                langName: mangaDetails["langName"],
                 artist: mangaDetails["artist"],
                 author: mangaDetails["author"],
-                avgRating: mangaDetails["avgRating"],
                 covers: mangaDetails["covers"],
                 desc: mangaDetails["description"],
                 follows: mangaDetails["follows"],
