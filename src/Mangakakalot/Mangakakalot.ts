@@ -8,7 +8,7 @@ export class Mangakakalot extends Source {
     super(cheerio)
   }
 
-  get version(): string { return '0.1.4'; }
+  get version(): string { return '0.1.5'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -329,10 +329,6 @@ export class Mangakakalot extends Source {
         param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`
         break
       }
-      case 'new_manga': {
-        param = `/manga_list?type=newest&category=all&state=all&page=${metadata.page}`
-        break
-      }
       default: return undefined
     }
 
@@ -350,8 +346,7 @@ export class Mangakakalot extends Source {
     let request = createRequestObject({ url: `${MK_DOMAIN}`, method: 'GET', })
     let section1 = createHomeSection({ id: 'top_week', title: 'POPULAR MANGA' })
     let section2 = createHomeSection({ id: 'latest_updates', title: 'LATEST MANGA RELEASES', view_more: this.constructGetViewMoreRequest('latest_updates', 1) })
-    let section3 = createHomeSection({ id: 'new_manga', title: 'NEW MANGA', view_more: this.constructGetViewMoreRequest('new_manga', 1) })
-    return [createHomeSectionRequest({ request: request, sections: [section1, section2, section3] })]
+    return [createHomeSectionRequest({ request: request, sections: [section1, section2] })]
   }
 
   getHomePageSections(data: any, sections: HomeSection[]): HomeSection[] {
@@ -371,35 +366,22 @@ export class Mangakakalot extends Source {
       }))
     }
 
-    for (let item of $('.content-homepage-item', '.panel-content-homepage').toArray()) {
+    for (let item of $('.first', '.doreamon').toArray()) {
       let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
       let image = $('img', item).attr('src') ?? ''
-      let itemRight = $('.content-homepage-item-right', item)
-      let latestUpdate = $('.item-chapter', itemRight).first()
+      let latestUpdate = $('.sts_1', item).first()
       updateManga.push(createMangaTile({
         id: id,
         image: image,
-        title: createIconText({ text: $('a', itemRight).first().text() }),
-        subtitleText: createIconText({ text: $('.item-author', itemRight).text() }),
+        title: createIconText({ text: $('a', item).first().text() }),
+        subtitleText: createIconText({ text: $('.item-author', item).text() }),
         primaryText: createIconText({ text: $('.genres-item-rate', item).text(), icon: 'star.fill' }),
         secondaryText: createIconText({ text: $('i', latestUpdate).text(), icon: 'clock.fill' })
       }))
     }
 
-    for (let item of $('a', '.panel-newest-content').toArray()) {
-      let id = $(item).attr('href')?.split('/').pop() ?? ''
-      let image = $('img', item).attr('src') ?? ''
-      let title = $('img', item).attr('alt') ?? ''
-      newManga.push(createMangaTile({
-        id: id,
-        image: image,
-        title: createIconText({ text: title })
-      }))
-    }
-
     sections[0].items = topManga
     sections[1].items = updateManga
-    sections[2].items = newManga
     return sections
   }
 
