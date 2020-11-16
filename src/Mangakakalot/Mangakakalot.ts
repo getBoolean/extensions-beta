@@ -8,7 +8,7 @@ export class Mangakakalot extends Source {
     super(cheerio)
   }
 
-  get version(): string { return '0.0.1'; }
+  get version(): string { return '0.0.2'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -214,31 +214,8 @@ export class Mangakakalot extends Source {
   }
 
   searchRequest(query: SearchRequest): Request | null {
-    let status = ""
-    switch (query.status) {
-      case 0: status = 'Completed'; break
-      case 1: status = 'Ongoing'; break
-      default: status = ''
-    }
-
-    let genre: string[] | undefined = query.includeGenre ?
-      (query.includeDemographic ? query.includeGenre.concat(query.includeDemographic) : query.includeGenre) :
-      query.includeDemographic
-    let genreNo: string[] | undefined = query.excludeGenre ?
-      (query.excludeDemographic ? query.excludeGenre.concat(query.excludeDemographic) : query.excludeGenre) :
-      query.excludeDemographic
-
-    let metadata: any = {
-      'keyword': query.title,
-      'author': query.author || query.artist || '',
-      'status': status,
-      'type': query.includeFormat,
-      'genre': genre,
-      'genreNo': genreNo
-    }
-
     return createRequestObject({
-      url: `${MK_DOMAIN}/search/`,
+      url: `${MK_DOMAIN}/search/story/`,
       metadata: metadata,
       headers: {
         "content-type": "application/x-www-form-urlencoded"
