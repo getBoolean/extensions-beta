@@ -8,7 +8,7 @@ export class Mangakakalot extends Source {
     super(cheerio)
   }
 
-  get version(): string { return '0.1.5'; }
+  get version(): string { return '0.1.9'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -353,7 +353,6 @@ export class Mangakakalot extends Source {
     let $ = this.cheerio.load(data)
     let topManga: MangaTile[] = []
     let updateManga: MangaTile[] = []
-    let newManga: MangaTile[] = []
 
     for (let item of $('.item', '.owl-carousel').toArray()) {
       let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
@@ -386,73 +385,83 @@ export class Mangakakalot extends Source {
   }
 
 
-  getViewMoreRequest(key: string): Request | null {
+  getViewMoreRequest(key: string): Request | undefined {
+    let metadata = { page: 1 }
+    let param = ''
+    switch (key) {
+      case 'latest_updates': {
+        param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`
+        break
+      }
+      default: return undefined
+    }
+
     return createRequestObject({
-      url: MK_DOMAIN,
-      method: 'GET'
+      url: `${MK_DOMAIN}`,
+      method: 'GET',
+      param: param,
+      metadata: metadata
     })
   }
 
-  getViewMoreItems(data: any, key: string): PagedResults | null {
+  getViewMoreItems(data: any, key: string, metadata: any): PagedResults | null {
+    let $ = this.cheerio.load(data)
     let manga: MangaTile[] = []
-    if (key == 'hot_update') {
-      let hot = JSON.parse((data.match(/vm.HotUpdateJSON = (.*);/) ?? [])[1])
-      hot.forEach((elem: any) => {
-        let id = elem.IndexName
-        let title = elem.SeriesName
-        let image = `${MK_IMAGE_DOMAIN}/${id}.jpg`
-        let time = (new Date(elem.Date)).toDateString()
-        time = time.slice(0, time.length - 5)
-        time = time.slice(4, time.length)
-
+    if (key == 'latest_updates') {
+      let panel = $('.truyen-list')
+      for (let item of $('.list-truyen-item-wrap', panel).toArray()) {
+        let id = ($('a', item).first().attr('href') ?? '').split('/').pop() ?? ''
+        let image = $('img', item).attr('src') ?? ''
+        let title = $('a', item).attr('title') ?? ''
+        let subtitle = $('.list-story-item-wrap-chapter', item).text()
         manga.push(createMangaTile({
           id: id,
           image: image,
           title: createIconText({ text: title }),
-          secondaryText: createIconText({ text: time, icon: 'clock.fill' })
+          subtitleText: createIconText({ text: subtitle })
         }))
-      })
-    }
-    else if (key == 'latest') {
-      let latest = JSON.parse((data.match(/vm.LatestJSON = (.*);/) ?? [])[1])
-      latest.forEach((elem: any) => {
-        let id = elem.IndexName
-        let title = elem.SeriesName
-        let image = `${MK_IMAGE_DOMAIN}/${id}.jpg`
-        let time = (new Date(elem.Date)).toDateString()
-        time = time.slice(0, time.length - 5)
-        time = time.slice(4, time.length)
-
-        manga.push(createMangaTile({
-          id: id,
-          image: image,
-          title: createIconText({ text: title }),
-          secondaryText: createIconText({ text: time, icon: 'clock.fill' })
-        }))
-      })
-    }
-    else if (key == 'new_titles') {
-      let newTitles = JSON.parse((data.match(/vm.NewSeriesJSON = (.*);/) ?? [])[1])
-      newTitles.forEach((elem: any) => {
-        let id = elem.IndexName
-        let title = elem.SeriesName
-        let image = `${MK_IMAGE_DOMAIN}/${id}.jpg`
-        let time = (new Date(elem.Date)).toDateString()
-        time = time.slice(0, time.length - 5)
-        time = time.slice(4, time.length)
-
-        manga.push(createMangaTile({
-          id: id,
-          image: image,
-          title: createIconText({ text: title })
-        }))
-      })
+      }
     }
     else return null
 
-    // Because this parses JSON, there is never a need for additional requests
+    let nextPage: Request | undefined = undefined
+    console.log(!this.isLastPage($));
+    if (!this.isLastPage($)) {
+      metadata.page = metadata.page++;
+      let param = ''
+      switch (key) {
+        case 'latest_updates': {
+          param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`
+          break
+        }
+        default: return null
+      }
+      nextPage = {
+        url: `${MK_DOMAIN}`,
+        method: 'GET',
+        param: param,
+        metadata: metadata
+      }
+      console.log(nextPage.url);
+      console.log(nextPage.method);
+      console.log(nextPage.param);
+    }
+
     return createPagedResults({
-      results: manga
-    })
+      results: manga,
+      nextPage: nextPage
+    });
+  }
+
+  private isLastPage($: CheerioStatic): boolean {
+    let current = $('.page-select').text();
+    let total = $('.page-last').text();
+
+    if (current) {
+      total = (/(\d+)/g.exec(total) ?? [''])[0]
+      return (+total) === (+current)
+    }
+
+    return true
   }
 }
