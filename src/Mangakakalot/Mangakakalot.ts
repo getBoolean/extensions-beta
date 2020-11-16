@@ -8,7 +8,7 @@ export class Mangakakalot extends Source {
     super(cheerio)
   }
 
-  get version(): string { return '0.0.13'; }
+  get version(): string { return '0.0.15'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -357,11 +357,13 @@ export class Mangakakalot extends Source {
     for (let item of $('.item', '.owl-carousel').toArray()) {
       let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
       let image = $('img', item).attr('src') ?? ''
+      let title = $('slide-caption', item).first().attr('title')
+      let subtitle = $('slide-caption', item).last().text()
       topManga.push(createMangaTile({
         id: id,
         image: image,
-        title: createIconText({ text: $('a', item).first().text() }),
-        subtitleText: createIconText({ text: $('[rel=nofollow]', item).text() })
+        title: createIconText({ text: title }),
+        subtitleText: createIconText({ text: subtitle })
       }))
     }
 
