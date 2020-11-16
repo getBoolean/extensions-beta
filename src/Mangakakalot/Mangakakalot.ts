@@ -8,7 +8,7 @@ export class Mangakakalot extends Source {
     super(cheerio)
   }
 
-  get version(): string { return '0.1.2'; }
+  get version(): string { return '0.1.3'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -214,6 +214,29 @@ export class Mangakakalot extends Source {
   }
 
   searchRequest(query: SearchRequest): Request | null {
+    let status = ""
+    switch (query.status) {
+      case 0: status = 'Completed'; break
+      case 1: status = 'Ongoing'; break
+      default: status = ''
+    }
+
+    let genre: string[] | undefined = query.includeGenre ?
+      (query.includeDemographic ? query.includeGenre.concat(query.includeDemographic) : query.includeGenre) :
+      query.includeDemographic
+    let genreNo: string[] | undefined = query.excludeGenre ?
+      (query.excludeDemographic ? query.excludeGenre.concat(query.excludeDemographic) : query.excludeGenre) :
+      query.excludeDemographic
+
+    let metadata: any = {
+      'keyword': query.title,
+      'author': query.author || query.artist || '',
+      'status': status,
+      'type': query.includeFormat,
+      'genre': genre,
+      'genreNo': genreNo
+    }
+    
     return createRequestObject({
       url: `${MK_DOMAIN}/search/story/`,
       metadata: metadata,
@@ -300,22 +323,18 @@ export class Mangakakalot extends Source {
 
   getHomePageSectionRequest(): HomeSectionRequest[] | null {
     let request = createRequestObject({ url: `${MK_DOMAIN}`, method: 'GET' })
-    let section1 = createHomeSection({ id: 'hot_update', title: 'HOT UPDATES' })
-    let section2 = createHomeSection({ id: 'latest', title: 'LATEST UPDATES' })
-    let section3 = createHomeSection({ id: 'new_titles', title: 'NEW TITLES' })
-    let section4 = createHomeSection({ id: 'recommended', title: 'RECOMMENDATIONS' })
+    let section1 = createHomeSection({ id: 'hot_update', title: 'POPULAR MANGA' })
+    let section2 = createHomeSection({ id: 'latest', title: 'LATEST MANGA RELEASES' })
 
-    return [createHomeSectionRequest({ request: request, sections: [section1, section2, section3, section4] })]
+    return [createHomeSectionRequest({ request: request, sections: [section1, section2] })]
   }
 
   getHomePageSections(data: any, sections: HomeSection[]): HomeSection[] {
     let $ = this.cheerio.load(data);
-    let hot = (JSON.parse((data.match(/vm.HotUpdateJSON = (.*);/) ?? [])[1])).slice(0, 15)
-    let latest = (JSON.parse((data.match(/vm.LatestJSON = (.*);/) ?? [])[1])).slice(0, 15)
-    let newTitles = (JSON.parse((data.match(/vm.NewSeriesJSON = (.*);/) ?? [])[1])).slice(0, 15)
-    let recommended = JSON.parse((data.match(/vm.RecommendationJSON = (.*);/) ?? [])[1])
+    let hot = (JSON.parse((data.match(/owl-item = (.*);/) ?? [])[1])).slice(0, 15)
+    let latest = (JSON.parse((data.match(/itemupdate first = (.*);/) ?? [])[1])).slice(0, 15)
 
-    let imgSource = ($('.ImageHolder').html()?.match(/ng-src="(.*)\//) ?? [])[1];
+    let imgSource = ($('.ImageHolder').html()?.match(/src="(.*)\//) ?? [])[1];
     if (imgSource !== MK_IMAGE_DOMAIN)
       MK_IMAGE_DOMAIN = imgSource;
 
@@ -353,37 +372,8 @@ export class Mangakakalot extends Source {
       }))
     })
 
-    let newManga: MangaTile[] = []
-    newTitles.forEach((elem: any) => {
-      let id = elem.IndexName
-      let title = elem.SeriesName
-      let image = `${MK_IMAGE_DOMAIN}/${id}.jpg`
-
-      newManga.push(createMangaTile({
-        id: id,
-        image: image,
-        title: createIconText({ text: title })
-      }))
-    })
-
-    let recManga: MangaTile[] = []
-    recommended.forEach((elem: any) => {
-      let id = elem.IndexName
-      let title = elem.SeriesName
-      let image = `${MK_IMAGE_DOMAIN}/${id}.jpg`
-      let time = (new Date(elem.Date)).toDateString()
-
-      recManga.push(createMangaTile({
-        id: id,
-        image: image,
-        title: createIconText({ text: title })
-      }))
-    })
-
     sections[0].items = hotManga
     sections[1].items = latestManga
-    sections[2].items = newManga
-    sections[3].items = recManga
     return sections
   }
 
