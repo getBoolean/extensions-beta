@@ -1,7 +1,7 @@
 import { Source, Manga, MangaStatus, Chapter, ChapterDetails, HomeSectionRequest, HomeSection, MangaTile, SearchRequest, LanguageCode, TagSection, Request, MangaUpdates, PagedResults, SourceTag, TagType } from "paperback-extensions-common"
 
 const MK_DOMAIN = 'https://mangakakalot.com'
-let MK_IMAGE_DOMAIN = 'https://s31.mkklcdnv31.com/mangakakalot'
+let MK_IMAGE_DOMAIN = 'https://avt.mkklcdnv6.com/'
 
 export class Mangakakalot extends Source {
   constructor(cheerio: CheerioAPI) {
@@ -67,7 +67,7 @@ export class Mangakakalot extends Source {
 
     let status = MangaStatus.ONGOING
     let summary = ''
-    let hentai = entity.genre.includes('Hentai') || entity.genre.includes('Adult')
+    let hentai = false
 
     let details = $('.list-group', info)
     for (let row of $('li', details).toArray()) {
