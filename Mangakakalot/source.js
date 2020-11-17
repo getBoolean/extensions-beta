@@ -2683,7 +2683,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.0.15'; }
+    get version() { return '0.0.20'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2717,59 +2717,96 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         return requests;
     }
     getMangaDetails(data, metadata) {
-        var _a, _b, _c, _d, _e, _f, _g;
+        var _a, _b;
         let manga = [];
         let $ = this.cheerio.load(data);
-        let json = JSON.parse((_b = (_a = $('[type=application\\/ld\\+json]').html()) === null || _a === void 0 ? void 0 : _a.replace(/\t*\n*/g, '')) !== null && _b !== void 0 ? _b : '');
-        let entity = json.mainEntity;
-        let info = $('.row');
-        let imgSource = ((_d = (_c = $('.ImgHolder').html()) === null || _c === void 0 ? void 0 : _c.match(/src="(.*)\//)) !== null && _d !== void 0 ? _d : [])[1];
-        if (imgSource !== MK_IMAGE_DOMAIN)
-            MK_IMAGE_DOMAIN = imgSource;
-        let image = `${MK_IMAGE_DOMAIN}/${metadata.id}.jpg`;
-        let title = (_e = $('h1', info).first().text()) !== null && _e !== void 0 ? _e : '';
-        let titles = [title];
-        let author = entity.author[0];
-        titles = titles.concat(entity.alternateName);
-        let follows = Number(((_g = (_f = $.root().html()) === null || _f === void 0 ? void 0 : _f.match(/vm.NumSubs = (.*);/)) !== null && _g !== void 0 ? _g : [])[1]);
-        let tagSections = [createTagSection({ id: '0', label: 'genres', tags: [] }),
-            createTagSection({ id: '1', label: 'format', tags: [] })];
-        tagSections[0].tags = entity.genre.map((elem) => createTag({ id: elem, label: elem }));
-        let update = entity.dateModified;
+        let panel = $('.manga-info-top');
+        let title = (_a = $('h1', panel).first().text()) !== null && _a !== void 0 ? _a : '';
+        let image = (_b = $('.manga-info-pic', panel).children().first().attr('src')) !== null && _b !== void 0 ? _b : '';
+        let table = $('.manga-info-text', panel);
+        let author = '';
+        let artist = '';
+        let autart = $('.manga-info-text li:nth-child(2)').text().replace('Author(s) :', '').split(/,|;/);
+        author = $(autart[0]).text();
+        if (autart.length > 1 && $(autart[1]).text() != ' ') {
+            artist = $(autart[1]).text();
+        }
+        let rating = 0;
         let status = paperback_extensions_common_1.MangaStatus.ONGOING;
-        let summary = '';
+        status = $('.manga-info-text li:nth-child(3)').text().split(' ').pop() == 'Ongoing' ? paperback_extensions_common_1.MangaStatus.ONGOING : paperback_extensions_common_1.MangaStatus.COMPLETED;
+        let titles = [title];
+        let follows = 0;
+        let views = 0;
+        let lastUpdate = '';
         let hentai = false;
-        let details = $('.list-group', info);
-        for (let row of $('li', details).toArray()) {
-            let text = $('.mlabel', row).text();
-            switch (text) {
-                case 'Type:': {
-                    let type = $('a', row).text();
-                    tagSections[1].tags.push(createTag({ id: type.trim(), label: type.trim() }));
-                    break;
-                }
-                case 'Status:': {
-                    status = $(row).text().includes('Ongoing') ? paperback_extensions_common_1.MangaStatus.ONGOING : paperback_extensions_common_1.MangaStatus.COMPLETED;
-                    break;
-                }
-                case 'Description:': {
-                    summary = $('div', row).text().trim();
-                    break;
+        let tagSections = [createTagSection({ id: '0', label: 'genres', tags: [] })];
+        // Genres
+        let elems = $('.manga-info-text li:nth-child(7)').find('a').toArray();
+        for (let elem of elems) {
+            let text = $(elem).text();
+            let id = ''; // $(elem).attr('href')?.split('/').pop().split('&')[1].replace('category=', '') ?? ''
+            if (text.toLowerCase().includes('smut')) {
+                hentai = true;
+            }
+            tagSections[0].tags.push(createTag({ id: id, label: text }));
+        }
+        // Date
+        let time = new Date($('.manga-info-text li:nth-child(4)').text().replace(/(-*(AM)*(PM)*)/g, '').replace('Last updated : ', ''));
+        lastUpdate = time.toDateString();
+        // Views
+        views = Number($('.manga-info-text li:nth-child(6)').text().replace(/,/g, '').replace('View : ', ''));
+        // Alt Titles
+        for (let row of $('li', table).toArray()) {
+            if ($(row).find('.story-alternative').length > 0) {
+                let alts = $('h2', table).text().replace('Alternative : ', '').split(/,|;/);
+                for (let alt of alts) {
+                    titles.push(alt.trim());
                 }
             }
+            /*else if ($(row).find('.manga-info-text li:nth-child(2)').length > 0) {
+              
+            }*/
+            /*else if ($(row).find('.manga-info-text li:nth-child(3)').length > 0) {
+              
+            }*/
+            /*else if ($(row).find('.manga-info-text li:nth-child(7)').find('a').length > 0) {
+              
+            }*/
+            /*else if ($(row).find('.manga-info-text li:nth-child(4)').length > 0) {
+              
+            }*/
+            /*else if ($(row).find('.manga-info-text li:nth-child(6)').length > 0) {
+              
+            }*/
         }
+        /*
+        table = $('.story-info-right-extent', panel)
+        for (let row of $('p', table).toArray()) {
+          if ($(row).find('.info-time').length > 0) {
+            let time = new Date($('.stre-value', row).text().replace(/(-*(AM)*(PM)*)/g, ''))
+            lastUpdate = time.toDateString()
+          }
+          else if ($(row).find('.info-view').length > 0) {
+            views = Number($('.stre-value', row).text().replace(/,/g, ''))
+          }
+        }*/
+        rating = Number($('#rate_row_cmd', table).text().replace('Mangakakalot.com rate : ', '').slice($('#rate_row_cmd', table).text().indexOf('Mangakakalot.com rate : '), $('#rate_row_cmd', table).text().indexOf(' / 5')));
+        follows = Number($('#rate_row_cmd', table).text().replace(' votes', '').split(' ').pop());
+        let summary = $('#noidungm', $('.leftCol')).text();
         manga.push(createManga({
             id: metadata.id,
             titles: titles,
             image: image,
-            rating: 0,
+            rating: Number(rating),
             status: status,
+            artist: artist,
             author: author,
             tags: tagSections,
-            desc: summary,
-            hentai: hentai,
+            views: views,
             follows: follows,
-            lastUpdate: update
+            lastUpdate: lastUpdate,
+            desc: summary,
+            hentai: hentai
         }));
         return manga;
     }
