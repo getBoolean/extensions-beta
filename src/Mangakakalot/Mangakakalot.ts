@@ -74,7 +74,7 @@ export class Mangakakalot extends Source {
     let elems = $('.manga-info-text li:nth-child(7)').find('a').toArray()
     for (let elem of elems) {
       let text = $(elem).text()
-      let id = $(elem).attr('href')?.split('/').pop().split('&')[1].replace('category=', '') ?? ''
+      let id = ''// $(elem).attr('href')?.split('/').pop().split('&')[1].replace('category=', '') ?? ''
       if (text.toLowerCase().includes('smut')) {
         hentai = true
       }
