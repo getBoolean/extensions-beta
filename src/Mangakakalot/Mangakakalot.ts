@@ -9,7 +9,7 @@ export class Mangakakalot extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.15'; }
+  get version(): string { return '0.0.19'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -48,61 +48,103 @@ export class Mangakakalot extends Source {
   getMangaDetails(data: any, metadata: any): Manga[] {
     let manga: Manga[] = []
     let $ = this.cheerio.load(data)
-    let json = JSON.parse($('[type=application\\/ld\\+json]').html()?.replace(/\t*\n*/g, '') ?? '')
-    let entity = json.mainEntity
-    let info = $('.row')
-    let imgSource = ($('.ImgHolder').html()?.match(/src="(.*)\//) ?? [])[1];
-    if (imgSource !== MK_IMAGE_DOMAIN)
-      MK_IMAGE_DOMAIN = imgSource;
-    let image = `${MK_IMAGE_DOMAIN}/${metadata.id}.jpg`
-    let title = $('h1', info).first().text() ?? ''
-    let titles = [title]
-    let author = entity.author[0]
-    titles = titles.concat(entity.alternateName)
-    let follows = Number(($.root().html()?.match(/vm.NumSubs = (.*);/) ?? [])[1])
-
-    let tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: [] }),
-    createTagSection({ id: '1', label: 'format', tags: [] })]
-    tagSections[0].tags = entity.genre.map((elem: string) => createTag({ id: elem, label: elem }))
-    let update = entity.dateModified
-
+    let panel = $('.manga-info-top')
+    let title = $('h1', panel).first().text() ?? ''
+    let image = $('.manga-info-pic', panel).children().first().attr('src') ?? ''
+    let table = $('.manga-info-text', panel)
+    let author = ''
+    let artist = ''
+    let autart = $('.manga-info-text li:nth-child(2)').text().replace('Author(s) :', '').split(/,|;/)
+    author = $(autart[0]).text()
+    if (autart.length > 1 && $(autart[1]).text() != ' ') {
+      artist = $(autart[1]).text()
+    }
+    let rating = 0
     let status = MangaStatus.ONGOING
-    let summary = ''
+    status = $('.manga-info-text li:nth-child(3)').text().split(' ').pop() == 'Ongoing' ? MangaStatus.ONGOING : MangaStatus.COMPLETED
+    let titles = [title]
+    let follows = 0
+    let views = 0
+    let lastUpdate = ''
     let hentai = false
 
-    let details = $('.list-group', info)
-    for (let row of $('li', details).toArray()) {
-      let text = $('.mlabel', row).text()
-      switch (text) {
-        case 'Type:': {
-          let type = $('a', row).text()
-          tagSections[1].tags.push(createTag({ id: type.trim(), label: type.trim() }))
-          break
-        }
-        case 'Status:': {
-          status = $(row).text().includes('Ongoing') ? MangaStatus.ONGOING : MangaStatus.COMPLETED
-          break
-        }
-        case 'Description:': {
-          summary = $('div', row).text().trim()
-          break
+    let tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: [] })]
+
+    // Genres
+    let elems = $('.manga-info-text li:nth-child(7)').find('a').toArray()
+    for (let elem of elems) {
+      let text = $(elem).text()
+      let id = $(elem).attr('href')?.split('/').pop().split('&')[1].replace('category=', '') ?? ''
+      if (text.toLowerCase().includes('smut')) {
+        hentai = true
+      }
+      tagSections[0].tags.push(createTag({ id: id, label: text }))
+    }
+
+    // Date
+    let time = new Date($('.manga-info-text li:nth-child(4)').text().replace(/(-*(AM)*(PM)*)/g, '').replace('Last updated : ', '') )
+    lastUpdate = time.toDateString()
+
+    // Views
+    views = Number($('.manga-info-text li:nth-child(6)').text().replace(/,/g, '').replace('View : ', '') )
+
+    // Alt Titles
+    for (let row of $('li', table).toArray()) {
+      if ($(row).find('.story-alternative').length > 0) {
+        let alts = $('h2', table).text().replace('Alternative : ','').split(/,|;/)
+        for (let alt of alts) {
+          titles.push(alt.trim())
         }
       }
+      /*else if ($(row).find('.manga-info-text li:nth-child(2)').length > 0) {
+        
+      }*/
+      /*else if ($(row).find('.manga-info-text li:nth-child(3)').length > 0) {
+        
+      }*/
+      /*else if ($(row).find('.manga-info-text li:nth-child(7)').find('a').length > 0) {
+        
+      }*/
+      /*else if ($(row).find('.manga-info-text li:nth-child(4)').length > 0) {
+        
+      }*/
+      /*else if ($(row).find('.manga-info-text li:nth-child(6)').length > 0) {
+        
+      }*/
     }
+
+    /*
+    table = $('.story-info-right-extent', panel)
+    for (let row of $('p', table).toArray()) {
+      if ($(row).find('.info-time').length > 0) {
+        let time = new Date($('.stre-value', row).text().replace(/(-*(AM)*(PM)*)/g, ''))
+        lastUpdate = time.toDateString()
+      }
+      else if ($(row).find('.info-view').length > 0) {
+        views = Number($('.stre-value', row).text().replace(/,/g, ''))
+      }
+    }*/
+
+    rating = Number($('#rate_row_cmd', table).text().replace('Mangakakalot.com rate : ', '').slice($('#rate_row_cmd', table).text().indexOf('Mangakakalot.com rate : '), $('#rate_row_cmd', table).text().indexOf(' / 5')) )
+    follows = Number($('#rate_row_cmd', table).text().replace(' votes', '').split(' ').pop() )
+    let summary = $('#noidungm', $('.leftCol')).text()
 
     manga.push(createManga({
       id: metadata.id,
       titles: titles,
       image: image,
-      rating: 0,
+      rating: Number(rating),
       status: status,
+      artist: artist,
       author: author,
       tags: tagSections,
-      desc: summary,
-      hentai: hentai,
+      views: views,
       follows: follows,
-      lastUpdate: update
+      lastUpdate: lastUpdate,
+      desc: summary,
+      hentai: hentai
     }))
+
     return manga
   }
 
