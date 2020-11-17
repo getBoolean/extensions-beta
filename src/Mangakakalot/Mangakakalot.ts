@@ -4,7 +4,7 @@ const MK_DOMAIN = 'https://mangakakalot.com'
 let MK_IMAGE_DOMAIN = 'https://avt.mkklcdnv6.com/'
 
 export class Mangakakalot extends Source {
-  constructor(cheerio: CheerioAPI) {
+  constructor(cheerio: CheerioAPI) { 
     super(cheerio)
   }
 
