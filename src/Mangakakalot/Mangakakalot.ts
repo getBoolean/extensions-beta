@@ -7,8 +7,7 @@ export class Mangakakalot extends Source {
   constructor(cheerio: CheerioAPI) {
     super(cheerio)
   }
-  
-  // @getBoolean
+
   get version(): string { return '0.0.15'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
