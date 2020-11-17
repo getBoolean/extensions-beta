@@ -2682,6 +2682,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
     constructor(cheerio) {
         super(cheerio);
     }
+    // @getBoolean
     get version() { return '0.0.15'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
