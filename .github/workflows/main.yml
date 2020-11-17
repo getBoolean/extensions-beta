@@ -12,6 +12,8 @@ jobs:
   build:
     name: Bundle and Publish Sources
     runs-on: ubuntu-latest
+    env: 
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
 
     strategy:
       matrix:
