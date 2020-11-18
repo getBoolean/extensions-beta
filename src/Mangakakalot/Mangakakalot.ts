@@ -402,7 +402,7 @@ export class Mangakakalot extends Source {
       let id = $('div.slide-caption', item).children().last().attr('href')?.slice( $('div.slide-caption', item).children().last().attr('href')?.indexOf('chapter/'), $('div.slide-caption', item).children().last().attr('href')?.indexOf('/chapter_')).split('/').pop() ?? ''
       
       let image = $('img', item).attr('src') ?? ''
-      let title = $('div.slide-caption', item).first().first().text()
+      let title = $('div.slide-caption', item).children().first().text()
       let subtitle = $('div.slide-caption', item).children().last().text()
       topManga.push(createMangaTile({
         id: id,
