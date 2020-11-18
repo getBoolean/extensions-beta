@@ -2690,7 +2690,11 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
     get authorWebsite() { return 'https://github.com/getBoolean'; }
     get description() { return 'Extension that pulls manga from Mangakakalot'; }
     get hentaiSource() { return false; }
-    getMangaShareUrl(mangaId) { return `${MK_DOMAIN}/manga/${mangaId}`; }
+    getMangaShareUrl(mangaId) {
+        if (mangaId.slice(1, 5) == 'read')
+            return `${MK_DOMAIN}/${mangaId}`;
+        return `${MK_DOMAIN}/manga/${mangaId}`;
+    }
     get websiteBaseURL() { return MK_DOMAIN; }
     get rateLimit() {
         return 2;
@@ -3046,6 +3050,8 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         for (let item of $('.item', '.owl-carousel').toArray()) {
             let id2 = (_b = (_a = $('a', item).first().attr('href')) === null || _a === void 0 ? void 0 : _a.split('/').pop()) !== null && _b !== void 0 ? _b : '';
             let id = (_f = (_c = $('div.slide-caption', item).children().last().attr('href')) === null || _c === void 0 ? void 0 : _c.slice((_d = $('div.slide-caption', item).children().last().attr('href')) === null || _d === void 0 ? void 0 : _d.indexOf('chapter/'), (_e = $('div.slide-caption', item).children().last().attr('href')) === null || _e === void 0 ? void 0 : _e.indexOf('/chapter_')).split('/').pop()) !== null && _f !== void 0 ? _f : '';
+            if (id2 != id)
+                id = id2;
             let image = (_g = $('img', item).attr('src')) !== null && _g !== void 0 ? _g : '';
             let title = $('div.slide-caption', item).children().first().text();
             let subtitle = $('div.slide-caption', item).children().last().text();
