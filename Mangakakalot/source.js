@@ -3039,16 +3039,16 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         return [createHomeSectionRequest({ request: request, sections: [section1, section2] })];
     }
     getHomePageSections(data, sections) {
-        var _a, _b, _c, _d, _e, _f, _g;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
         let $ = this.cheerio.load(data);
         let topManga = [];
         let updateManga = [];
         for (let item of $('.item', '.owl-carousel').toArray()) {
-            //let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
-            let id = (_a = $('div.slide-caption', item).children().last().attr('href')) === null || _a === void 0 ? void 0 : _a.slice((_b = $('div.slide-caption', item).children().last().attr('href')) === null || _b === void 0 ? void 0 : _b.indexOf('chapter/'), (_c = $('div.slide-caption', item).children().last().attr('href')) === null || _c === void 0 ? void 0 : _c.indexOf('/chapter_')).split('/').pop();
-            let image = (_d = $('img', item).attr('src')) !== null && _d !== void 0 ? _d : '';
+            let id2 = (_b = (_a = $('a', item).first().attr('href')) === null || _a === void 0 ? void 0 : _a.split('/').pop()) !== null && _b !== void 0 ? _b : '';
+            let id = (_f = (_c = $('div.slide-caption', item).children().last().attr('href')) === null || _c === void 0 ? void 0 : _c.slice((_d = $('div.slide-caption', item).children().last().attr('href')) === null || _d === void 0 ? void 0 : _d.indexOf('chapter/'), (_e = $('div.slide-caption', item).children().last().attr('href')) === null || _e === void 0 ? void 0 : _e.indexOf('/chapter_')).split('/').pop()) !== null && _f !== void 0 ? _f : '';
+            let image = (_g = $('img', item).attr('src')) !== null && _g !== void 0 ? _g : '';
             let title = $('div.slide-caption', item).first().first().text();
-            let subtitle = $('div.slide-caption', item).last().text();
+            let subtitle = $('div.slide-caption', item).children().last().text();
             topManga.push(createMangaTile({
                 id: id,
                 image: image,
@@ -3057,8 +3057,8 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
             }));
         }
         for (let item of $('.first', '.doreamon').toArray()) {
-            let id = (_f = (_e = $('a', item).first().attr('href')) === null || _e === void 0 ? void 0 : _e.split('/').pop()) !== null && _f !== void 0 ? _f : '';
-            let image = (_g = $('img', item).attr('src')) !== null && _g !== void 0 ? _g : '';
+            let id = (_j = (_h = $('a', item).first().attr('href')) === null || _h === void 0 ? void 0 : _h.split('/').pop()) !== null && _j !== void 0 ? _j : '';
+            let image = (_k = $('img', item).attr('src')) !== null && _k !== void 0 ? _k : '';
             let latestUpdate = $('.sts_1', item).first();
             updateManga.push(createMangaTile({
                 id: id,
