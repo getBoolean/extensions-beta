@@ -9,7 +9,7 @@ export class Mangakakalot extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.24'; }
+  get version(): string { return '0.0.25'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -17,7 +17,7 @@ export class Mangakakalot extends Source {
   get description(): string { return 'Extension that pulls manga from Mangakakalot' }
   get hentaiSource(): boolean { return false }
   getMangaShareUrl(mangaId: string): string | null { 
-    if ( mangaId.slice(1,5) == 'read')
+    if ( mangaId.includes('read-'))
       return `${MK_DOMAIN}/${mangaId}`
     return `${MK_DOMAIN}/manga/${mangaId}` 
   }
@@ -39,14 +39,14 @@ export class Mangakakalot extends Source {
     let requests: Request[] = []
     for (let id of ids) {
       let metadata = { 'id': id }
-      //let url = `${MK_DOMAIN}/manga/`
-      //if ( id.slice(1,5) == 'read')
-      //  url = `${MK_DOMAIN}/`
+      let url = `${MK_DOMAIN}/manga/`
+      if ( id.includes('read-') )
+        url = `${MK_DOMAIN}/`
       
       
       requests.push(createRequestObject({
-      //  url: url,
-        url: `${MK_DOMAIN}/manga/`,
+        url: url,
+        //url: `${MK_DOMAIN}/manga/`,
         metadata: metadata,
         method: 'GET',
         param: id
