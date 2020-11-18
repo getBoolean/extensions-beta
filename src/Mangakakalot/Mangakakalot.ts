@@ -398,11 +398,12 @@ export class Mangakakalot extends Source {
     let updateManga: MangaTile[] = []
 
     for (let item of $('.item', '.owl-carousel').toArray()) {
-      //let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
-      let id = $('div.slide-caption', item).children().last().attr('href')?.slice( $('div.slide-caption', item).children().last().attr('href')?.indexOf('chapter/'), $('div.slide-caption', item).children().last().attr('href')?.indexOf('/chapter_')).split('/').pop()
+      let id2 = $('a', item).first().attr('href')?.split('/').pop() ?? ''
+      let id = $('div.slide-caption', item).children().last().attr('href')?.slice( $('div.slide-caption', item).children().last().attr('href')?.indexOf('chapter/'), $('div.slide-caption', item).children().last().attr('href')?.indexOf('/chapter_')).split('/').pop() ?? ''
+      
       let image = $('img', item).attr('src') ?? ''
       let title = $('div.slide-caption', item).first().first().text()
-      let subtitle = $('div.slide-caption', item).last().text()
+      let subtitle = $('div.slide-caption', item).children().last().text()
       topManga.push(createMangaTile({
         id: id,
         image: image,
