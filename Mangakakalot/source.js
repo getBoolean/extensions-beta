@@ -2683,7 +2683,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.0.21'; }
+    get version() { return '0.0.24'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2711,7 +2711,11 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         let requests = [];
         for (let id of ids) {
             let metadata = { 'id': id };
+            //let url = `${MK_DOMAIN}/manga/`
+            //if ( id.slice(1,5) == 'read')
+            //  url = `${MK_DOMAIN}/`
             requests.push(createRequestObject({
+                //  url: url,
                 url: `${MK_DOMAIN}/manga/`,
                 metadata: metadata,
                 method: 'GET',
