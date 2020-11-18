@@ -3047,7 +3047,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
             let id2 = (_b = (_a = $('a', item).first().attr('href')) === null || _a === void 0 ? void 0 : _a.split('/').pop()) !== null && _b !== void 0 ? _b : '';
             let id = (_f = (_c = $('div.slide-caption', item).children().last().attr('href')) === null || _c === void 0 ? void 0 : _c.slice((_d = $('div.slide-caption', item).children().last().attr('href')) === null || _d === void 0 ? void 0 : _d.indexOf('chapter/'), (_e = $('div.slide-caption', item).children().last().attr('href')) === null || _e === void 0 ? void 0 : _e.indexOf('/chapter_')).split('/').pop()) !== null && _f !== void 0 ? _f : '';
             let image = (_g = $('img', item).attr('src')) !== null && _g !== void 0 ? _g : '';
-            let title = $('div.slide-caption', item).first().first().text();
+            let title = $('div.slide-caption', item).children().first().text();
             let subtitle = $('div.slide-caption', item).children().last().text();
             topManga.push(createMangaTile({
                 id: id,
