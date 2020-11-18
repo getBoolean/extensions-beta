@@ -3039,13 +3039,14 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         return [createHomeSectionRequest({ request: request, sections: [section1, section2] })];
     }
     getHomePageSections(data, sections) {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b, _c, _d, _e, _f, _g;
         let $ = this.cheerio.load(data);
         let topManga = [];
         let updateManga = [];
         for (let item of $('.item', '.owl-carousel').toArray()) {
-            let id = (_b = (_a = $('a', item).first().attr('href')) === null || _a === void 0 ? void 0 : _a.split('/').pop()) !== null && _b !== void 0 ? _b : '';
-            let image = (_c = $('img', item).attr('src')) !== null && _c !== void 0 ? _c : '';
+            //let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
+            let id = (_a = $('div.slide-caption', item).children().last().attr('href')) === null || _a === void 0 ? void 0 : _a.slice((_b = $('div.slide-caption', item).children().last().attr('href')) === null || _b === void 0 ? void 0 : _b.indexOf('chapter/'), (_c = $('div.slide-caption', item).children().last().attr('href')) === null || _c === void 0 ? void 0 : _c.indexOf('/chapter_')).split('/').pop();
+            let image = (_d = $('img', item).attr('src')) !== null && _d !== void 0 ? _d : '';
             let title = $('div.slide-caption', item).first().first().text();
             let subtitle = $('div.slide-caption', item).last().text();
             topManga.push(createMangaTile({
@@ -3056,8 +3057,8 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
             }));
         }
         for (let item of $('.first', '.doreamon').toArray()) {
-            let id = (_e = (_d = $('a', item).first().attr('href')) === null || _d === void 0 ? void 0 : _d.split('/').pop()) !== null && _e !== void 0 ? _e : '';
-            let image = (_f = $('img', item).attr('src')) !== null && _f !== void 0 ? _f : '';
+            let id = (_f = (_e = $('a', item).first().attr('href')) === null || _e === void 0 ? void 0 : _e.split('/').pop()) !== null && _f !== void 0 ? _f : '';
+            let image = (_g = $('img', item).attr('src')) !== null && _g !== void 0 ? _g : '';
             let latestUpdate = $('.sts_1', item).first();
             updateManga.push(createMangaTile({
                 id: id,
