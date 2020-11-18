@@ -16,7 +16,11 @@ export class Mangakakalot extends Source {
   get authorWebsite(): string { return 'https://github.com/getBoolean' }
   get description(): string { return 'Extension that pulls manga from Mangakakalot' }
   get hentaiSource(): boolean { return false }
-  getMangaShareUrl(mangaId: string): string | null { return `${MK_DOMAIN}/manga/${mangaId}` }
+  getMangaShareUrl(mangaId: string): string | null { 
+    if ( mangaId.slice(1,5) == 'read')
+      return `${MK_DOMAIN}/${mangaId}`
+    return `${MK_DOMAIN}/manga/${mangaId}` 
+  }
   get websiteBaseURL(): string { return MK_DOMAIN }
   get rateLimit(): Number {
     return 2
@@ -400,7 +404,9 @@ export class Mangakakalot extends Source {
     for (let item of $('.item', '.owl-carousel').toArray()) {
       let id2 = $('a', item).first().attr('href')?.split('/').pop() ?? ''
       let id = $('div.slide-caption', item).children().last().attr('href')?.slice( $('div.slide-caption', item).children().last().attr('href')?.indexOf('chapter/'), $('div.slide-caption', item).children().last().attr('href')?.indexOf('/chapter_')).split('/').pop() ?? ''
-      
+      if (id2 != id)
+        id = id2
+
       let image = $('img', item).attr('src') ?? ''
       let title = $('div.slide-caption', item).children().first().text()
       let subtitle = $('div.slide-caption', item).children().last().text()
