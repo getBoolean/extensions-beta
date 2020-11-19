@@ -142,7 +142,15 @@ export class Mangakakalot extends Source {
 
     rating = Number($('#rate_row_cmd', table).text().replace('Mangakakalot.com rate : ', '').slice($('#rate_row_cmd', table).text().indexOf('Mangakakalot.com rate : '), $('#rate_row_cmd', table).text().indexOf(' / 5')) )
     follows = Number($('#rate_row_cmd', table).text().replace(' votes', '').split(' ').pop() )
-    let summary = $('#noidungm', $('.leftCol')).text()
+    // Exclude child text: https://www.viralpatel.net/jquery-get-text-element-without-child-element/
+    // Remove line breaks from start and end: https://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
+    let summary = $('#noidungm', $('.leftCol'))
+                    .clone()    //clone the element
+                    .children() //select all the children
+                    .remove()   //remove all the children
+                    .end()  //again go back to selected element
+                    .text().replace(/^\s+|\s+$/g, '')
+    
 
     manga.push(createManga({
       id: metadata.id,
