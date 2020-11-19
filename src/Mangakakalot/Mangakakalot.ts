@@ -9,7 +9,7 @@ export class Mangakakalot extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.25'; }
+  get version(): string { return '0.0.27'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -39,11 +39,14 @@ export class Mangakakalot extends Source {
     let requests: Request[] = []
     for (let id of ids) {
       let metadata = { 'id': id }
-      let url = `${MK_DOMAIN}/manga/`
+      let url = ''
       if ( id.includes('read-') )
         url = `${MK_DOMAIN}/`
-      
-      
+      else
+        url = `${MK_DOMAIN}/manga/`
+      //console.log(url)
+      //console.log(id)
+
       requests.push(createRequestObject({
         url: url,
         //url: `${MK_DOMAIN}/manga/`,
@@ -58,6 +61,7 @@ export class Mangakakalot extends Source {
   getMangaDetails(data: any, metadata: any): Manga[] {
     let manga: Manga[] = []
     let $ = this.cheerio.load(data)
+    console.log($)
     let panel = $('.manga-info-top')
     let title = $('h1', panel).first().text() ?? ''
     let image = $('.manga-info-pic', panel).children().first().attr('src') ?? ''
@@ -160,8 +164,13 @@ export class Mangakakalot extends Source {
 
   getChaptersRequest(mangaId: string): Request {
     let metadata = { 'id': mangaId }
+    let url = ''
+    if ( mangaId.includes('read-') )
+        url = `${MK_DOMAIN}/`
+      else
+        url = `${MK_DOMAIN}/manga/`
     return createRequestObject({
-      url: `${MK_DOMAIN}/manga/`,
+      url: url,
       method: "GET",
       metadata: metadata,
       headers: {
