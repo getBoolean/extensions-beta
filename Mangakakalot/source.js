@@ -2683,7 +2683,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.0.29'; }
+    get version() { return '0.0.31'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2691,8 +2691,10 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
     get description() { return 'Extension that pulls manga from Mangakakalot'; }
     get hentaiSource() { return false; }
     getMangaShareUrl(mangaId) {
-        if (mangaId.includes('read-'))
+        if (mangaId.includes('read-')) {
+            //console.log(`${MK_DOMAIN}/${mangaId}`)
             return `${MK_DOMAIN}/${mangaId}`;
+        }
         return `${MK_DOMAIN}/manga/${mangaId}`;
     }
     get websiteBaseURL() { return MK_DOMAIN; }
@@ -2713,9 +2715,12 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
             let metadata = { 'id': id };
             let url = '';
             if (id.includes('read-'))
+                //url = `${Mangakakalot.getAbsoluteDomainUrl()}/`
                 url = `${MK_DOMAIN}/`;
-            else
+            else {
+                //url = `${Mangakakalot.getAbsoluteDomainUrl()}/manga/`
                 url = `${MK_DOMAIN}/manga/`;
+            }
             //console.log(url)
             //console.log(id)
             requests.push(createRequestObject({
