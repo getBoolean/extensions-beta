@@ -38,6 +38,7 @@ export class Mangakakalot extends Source {
     ]
   }
 
+  // Done @getBoolean
   getMangaDetailsRequest(ids: string[]): Request[] {
     let requests: Request[] = []
     for (let id of ids) {
@@ -69,6 +70,7 @@ export class Mangakakalot extends Source {
     return requests
   }
 
+  // Done @getBoolean
   getMangaDetails(data: any, metadata: any): Manga[] {
     let manga: Manga[] = []
     if (metadata.id.toLowerCase().includes('mangakakalot')) {
@@ -83,6 +85,7 @@ export class Mangakakalot extends Source {
     return manga
   }
 
+  // Done @getBoolean
   parseMangakakalotMangaDetails(data: any, metadata: any, manga: Manga[]): Manga[] {
     console.log('Inside parseMangakakalotMangaDetails()')
     let $ = this.cheerio.load(data)
@@ -228,6 +231,8 @@ export class Mangakakalot extends Source {
     rating = Number($('[property=v\\:average]', table).text())
     follows = Number($('[property=v\\:votes]', table).text())
     //let summary = $('.panel-story-info-description', panel).text()
+    // Exclude child text: https://www.viralpatel.net/jquery-get-text-element-without-child-element/
+    // Remove line breaks from start and end: https://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
     let summary = $('.panel-story-info-description', panel)
                     .clone()    //clone the element
                     .children() //select all the children
@@ -254,6 +259,7 @@ export class Mangakakalot extends Source {
     return manga
   }
 
+  // TODO: @getBoolean
   getChaptersRequest(mangaId: string): Request {
     let metadata = { 'id': mangaId }
     let url = ''
@@ -272,6 +278,7 @@ export class Mangakakalot extends Source {
     })
   }
 
+  // TODO: @getBoolean
   getChapters(data: any, metadata: any): Chapter[] {
     let $ = this.cheerio.load(data)
     let chapterJS: any[] = JSON.parse(($.root().html()?.match(/vm.Chapters = (.*);/) ?? [])[1]).reverse()
@@ -302,6 +309,7 @@ export class Mangakakalot extends Source {
     return chapters
   }
 
+  // TODO: @getBoolean
   getChapterDetailsRequest(mangaId: string, chapId: string): Request {
     let metadata = { 'mangaId': mangaId, 'chapterId': chapId, 'nextPage': false, 'page': 1 }
     return createRequestObject({
@@ -315,6 +323,7 @@ export class Mangakakalot extends Source {
     })
   }
 
+  // TODO: @getBoolean
   getChapterDetails(data: any, metadata: any): ChapterDetails {
     let pages: string[] = []
     let pathName = JSON.parse((data.match(/vm.CurPathName = (.*);/) ?? [])[1])
@@ -340,6 +349,7 @@ export class Mangakakalot extends Source {
     return chapterDetails
   }
 
+  // TODO: @getBoolean
   filterUpdatedMangaRequest(ids: any, time: Date): Request {
     let metadata = { 'ids': ids, 'referenceTime': time }
     return createRequestObject({
@@ -352,6 +362,7 @@ export class Mangakakalot extends Source {
     })
   }
 
+  // TODO: @getBoolean
   filterUpdatedManga(data: any, metadata: any): MangaUpdates {
     let $ = this.cheerio.load(data)
 
@@ -367,6 +378,7 @@ export class Mangakakalot extends Source {
     return createMangaUpdates(returnObject)
   }
 
+  // TODO: @getBoolean
   searchRequest(query: SearchRequest): Request | null {
     let status = ""
     switch (query.status) {
@@ -401,6 +413,7 @@ export class Mangakakalot extends Source {
     })
   }
 
+  // TODO: @getBoolean
   search(data: any, metadata: any): PagedResults | null {
     let $ = this.cheerio.load(data)
     let mangaTiles: MangaTile[] = []
@@ -454,6 +467,7 @@ export class Mangakakalot extends Source {
     })
   }
 
+  // TODO: @getBoolean
   getTagsRequest(): Request | null {
     return createRequestObject({
       url: `${MK_DOMAIN}/search/`,
@@ -464,6 +478,7 @@ export class Mangakakalot extends Source {
     })
   }
 
+  // TODO: @getBoolean
   getTags(data: any): TagSection[] | null {
     let tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: [] }),
     createTagSection({ id: '1', label: 'format', tags: [] })]
@@ -475,6 +490,8 @@ export class Mangakakalot extends Source {
     return tagSections
   }
 
+  // TODO: @getBoolean
+  // Currently broken
   private constructGetViewMoreRequest(key: string, page: number) {
     let metadata = { page: page }
     let param = ''
@@ -495,6 +512,7 @@ export class Mangakakalot extends Source {
     })
   }
 
+  // Done
   getHomePageSectionRequest(): HomeSectionRequest[] | null {
     let request = createRequestObject({ url: `${MK_DOMAIN}`, method: 'GET', })
     let section1 = createHomeSection({ id: 'top_week', title: 'POPULAR MANGA' })
@@ -502,6 +520,7 @@ export class Mangakakalot extends Source {
     return [createHomeSectionRequest({ request: request, sections: [section1, section2] })]
   }
 
+  // Done
   getHomePageSections(data: any, sections: HomeSection[]): HomeSection[] {
     let $ = this.cheerio.load(data)
     let topManga: MangaTile[] = []
@@ -551,6 +570,7 @@ export class Mangakakalot extends Source {
   }
 
 
+  // TODO: @getBoolean
   getViewMoreRequest(key: string): Request | undefined {
     let metadata = { page: 1 }
     let param = ''
@@ -569,6 +589,7 @@ export class Mangakakalot extends Source {
     })
   }
 
+  // TODO: @getBoolean
   getViewMoreItems(data: any, key: string, metadata: any): PagedResults | null {
     let $ = this.cheerio.load(data)
     let manga: MangaTile[] = []
