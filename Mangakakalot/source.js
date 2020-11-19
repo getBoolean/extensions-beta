@@ -2739,10 +2739,10 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         let table = $('.manga-info-text', panel);
         let author = '';
         let artist = '';
-        let autart = $('.manga-info-text li:nth-child(2)').text().replace('Author(s) :', '').split(/,|;/);
-        author = $(autart[0]).text();
+        let autart = $('.manga-info-text li:nth-child(2)').text().replace('Author(s) :', '').split(/,  |;/);
+        author = autart[0];
         if (autart.length > 1 && $(autart[1]).text() != ' ') {
-            artist = $(autart[1]).text();
+            artist = autart[1];
         }
         let rating = 0;
         let status = paperback_extensions_common_1.MangaStatus.ONGOING;
