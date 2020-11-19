@@ -46,7 +46,7 @@ export class Mangakakalot extends Source {
         url = `${MK_DOMAIN}/manga/`
       //console.log(url)
       //console.log(id)
-
+      
       requests.push(createRequestObject({
         url: url,
         //url: `${MK_DOMAIN}/manga/`,
@@ -68,7 +68,8 @@ export class Mangakakalot extends Source {
     let table = $('.manga-info-text', panel)
     let author = ''
     let artist = ''
-    let autart = $('.manga-info-text li:nth-child(2)').text().replace('Author(s) :', '').split(/,  |;/)
+    let autart = $('.manga-info-text li:nth-child(2)').text().replace('Author(s) :', '').replace(/\r?\n|\r/g, '').split(',  ')
+    autart[autart.length-1] = autart[autart.length-1]?.replace(', ', '')
     author = autart[0]
     if (autart.length > 1 && $(autart[1]).text() != ' ') {
       artist = autart[1]
