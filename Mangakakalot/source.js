@@ -2683,7 +2683,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.0.28'; }
+    get version() { return '0.0.29'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -3010,12 +3010,11 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
     constructGetViewMoreRequest(key, page) {
         let metadata = { page: page };
         let param = '';
-        switch (key) {
-            case 'latest_updates': {
-                param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`;
-                break;
-            }
-            default: return undefined;
+        if (key == 'latest_updates') {
+            param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`;
+        }
+        else {
+            return undefined;
         }
         return createRequestObject({
             url: `${MK_DOMAIN}`,
@@ -3055,14 +3054,12 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         for (let item of $('.first', '.doreamon').toArray()) {
             let id = (_j = (_h = $('a', item).first().attr('href')) === null || _h === void 0 ? void 0 : _h.split('/').pop()) !== null && _j !== void 0 ? _j : '';
             let image = (_k = $('img', item).attr('src')) !== null && _k !== void 0 ? _k : '';
-            let latestUpdate = $('.sts_1', item).first();
+            //let secondaryText = $('li:nth-child(2) > i', item).text() ?? ''
             updateManga.push(createMangaTile({
                 id: id,
                 image: image,
                 title: createIconText({ text: $('h3', item).text() }),
                 subtitleText: createIconText({ text: $('.sts_1', item).first().text() }),
-                primaryText: createIconText({ text: $('.genres-item-rate', item).text(), icon: 'star.fill' }),
-                secondaryText: createIconText({ text: $('i', latestUpdate).text(), icon: 'clock.fill' })
             }));
         }
         sections[0].items = topManga;
@@ -3072,12 +3069,11 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
     getViewMoreRequest(key) {
         let metadata = { page: 1 };
         let param = '';
-        switch (key) {
-            case 'latest_updates': {
-                param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`;
-                break;
-            }
-            default: return undefined;
+        if (key == 'latest_updates') {
+            param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`;
+        }
+        else {
+            return undefined;
         }
         return createRequestObject({
             url: `${MK_DOMAIN}`,
@@ -3112,12 +3108,11 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         if (!this.isLastPage($)) {
             metadata.page = metadata.page++;
             let param = '';
-            switch (key) {
-                case 'latest_updates': {
-                    param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`;
-                    break;
-                }
-                default: return null;
+            if (key == 'latest_updates') {
+                param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`;
+            }
+            else {
+                return null;
             }
             nextPage = {
                 url: `${MK_DOMAIN}`,
