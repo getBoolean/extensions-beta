@@ -2683,7 +2683,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.0.25'; }
+    get version() { return '0.0.27'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2711,9 +2711,13 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         let requests = [];
         for (let id of ids) {
             let metadata = { 'id': id };
-            let url = `${MK_DOMAIN}/manga/`;
+            let url = '';
             if (id.includes('read-'))
                 url = `${MK_DOMAIN}/`;
+            else
+                url = `${MK_DOMAIN}/manga/`;
+            //console.log(url)
+            //console.log(id)
             requests.push(createRequestObject({
                 url: url,
                 //url: `${MK_DOMAIN}/manga/`,
@@ -2728,6 +2732,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         var _a, _b;
         let manga = [];
         let $ = this.cheerio.load(data);
+        console.log($);
         let panel = $('.manga-info-top');
         let title = (_a = $('h1', panel).first().text()) !== null && _a !== void 0 ? _a : '';
         let image = (_b = $('.manga-info-pic', panel).children().first().attr('src')) !== null && _b !== void 0 ? _b : '';
@@ -2820,8 +2825,13 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
     }
     getChaptersRequest(mangaId) {
         let metadata = { 'id': mangaId };
+        let url = '';
+        if (mangaId.includes('read-'))
+            url = `${MK_DOMAIN}/`;
+        else
+            url = `${MK_DOMAIN}/manga/`;
         return createRequestObject({
-            url: `${MK_DOMAIN}/manga/`,
+            url: url,
             method: "GET",
             metadata: metadata,
             headers: {
