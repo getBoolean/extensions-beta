@@ -2710,6 +2710,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
             }
         ];
     }
+    // Done @getBoolean
     getMangaDetailsRequest(ids) {
         let requests = [];
         for (let id of ids) {
@@ -2738,6 +2739,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         }
         return requests;
     }
+    // Done @getBoolean
     getMangaDetails(data, metadata) {
         let manga = [];
         if (metadata.id.toLowerCase().includes('mangakakalot')) {
@@ -2750,6 +2752,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         }
         return manga;
     }
+    // Done @getBoolean
     parseMangakakalotMangaDetails(data, metadata, manga) {
         var _a, _b, _c, _d, _e, _f;
         console.log('Inside parseMangakakalotMangaDetails()');
@@ -2883,6 +2886,8 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         rating = Number($('[property=v\\:average]', table).text());
         follows = Number($('[property=v\\:votes]', table).text());
         //let summary = $('.panel-story-info-description', panel).text()
+        // Exclude child text: https://www.viralpatel.net/jquery-get-text-element-without-child-element/
+        // Remove line breaks from start and end: https://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
         let summary = $('.panel-story-info-description', panel)
             .clone() //clone the element
             .children() //select all the children
@@ -2906,6 +2911,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         }));
         return manga;
     }
+    // TODO: @getBoolean
     getChaptersRequest(mangaId) {
         let metadata = { 'id': mangaId };
         let url = '';
@@ -2923,6 +2929,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
             param: mangaId
         });
     }
+    // TODO: @getBoolean
     getChapters(data, metadata) {
         var _a, _b;
         let $ = this.cheerio.load(data);
@@ -2951,6 +2958,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         });
         return chapters;
     }
+    // TODO: @getBoolean
     getChapterDetailsRequest(mangaId, chapId) {
         let metadata = { 'mangaId': mangaId, 'chapterId': chapId, 'nextPage': false, 'page': 1 };
         return createRequestObject({
@@ -2963,6 +2971,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
             param: chapId
         });
     }
+    // TODO: @getBoolean
     getChapterDetails(data, metadata) {
         var _a, _b;
         let pages = [];
@@ -2984,6 +2993,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         });
         return chapterDetails;
     }
+    // TODO: @getBoolean
     filterUpdatedMangaRequest(ids, time) {
         let metadata = { 'ids': ids, 'referenceTime': time };
         return createRequestObject({
@@ -2995,6 +3005,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
             method: "GET"
         });
     }
+    // TODO: @getBoolean
     filterUpdatedManga(data, metadata) {
         var _a;
         let $ = this.cheerio.load(data);
@@ -3009,6 +3020,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         });
         return createMangaUpdates(returnObject);
     }
+    // TODO: @getBoolean
     searchRequest(query) {
         let status = "";
         switch (query.status) {
@@ -3043,6 +3055,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
             method: "GET"
         });
     }
+    // TODO: @getBoolean
     search(data, metadata) {
         var _a, _b, _c;
         let $ = this.cheerio.load(data);
@@ -3094,6 +3107,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
             results: mangaTiles
         });
     }
+    // TODO: @getBoolean
     getTagsRequest() {
         return createRequestObject({
             url: `${MK_DOMAIN}/search/`,
@@ -3103,6 +3117,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
             }
         });
     }
+    // TODO: @getBoolean
     getTags(data) {
         var _a, _b, _c;
         let tagSections = [createTagSection({ id: '0', label: 'genres', tags: [] }),
@@ -3114,6 +3129,8 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         tagSections[1].tags = types.map((e) => createTag({ id: e, label: e }));
         return tagSections;
     }
+    // TODO: @getBoolean
+    // Currently broken
     constructGetViewMoreRequest(key, page) {
         let metadata = { page: page };
         let param = '';
@@ -3132,12 +3149,14 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
             }
         });
     }
+    // Done
     getHomePageSectionRequest() {
         let request = createRequestObject({ url: `${MK_DOMAIN}`, method: 'GET', });
         let section1 = createHomeSection({ id: 'top_week', title: 'POPULAR MANGA' });
         let section2 = createHomeSection({ id: 'latest_updates', title: 'LATEST MANGA RELEASES', view_more: this.constructGetViewMoreRequest('latest_updates', 1) });
         return [createHomeSectionRequest({ request: request, sections: [section1, section2] })];
     }
+    // Done
     getHomePageSections(data, sections) {
         var _a, _b, _c, _d;
         let $ = this.cheerio.load(data);
@@ -3179,6 +3198,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         sections[1].items = updateManga;
         return sections;
     }
+    // TODO: @getBoolean
     getViewMoreRequest(key) {
         let metadata = { page: 1 };
         let param = '';
@@ -3195,6 +3215,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
             metadata: metadata
         });
     }
+    // TODO: @getBoolean
     getViewMoreItems(data, key, metadata) {
         var _a, _b, _c, _d, _e;
         let $ = this.cheerio.load(data);
