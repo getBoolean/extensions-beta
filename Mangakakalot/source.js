@@ -2729,7 +2729,7 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         return requests;
     }
     getMangaDetails(data, metadata) {
-        var _a, _b;
+        var _a, _b, _c;
         let manga = [];
         let $ = this.cheerio.load(data);
         console.log($);
@@ -2739,7 +2739,8 @@ class Mangakakalot extends paperback_extensions_common_1.Source {
         let table = $('.manga-info-text', panel);
         let author = '';
         let artist = '';
-        let autart = $('.manga-info-text li:nth-child(2)').text().replace('Author(s) :', '').split(/,  |;/);
+        let autart = $('.manga-info-text li:nth-child(2)').text().replace('Author(s) :', '').replace(/\r?\n|\r/g, '').split(',  ');
+        autart[autart.length - 1] = (_c = autart[autart.length - 1]) === null || _c === void 0 ? void 0 : _c.replace(', ', '');
         author = autart[0];
         if (autart.length > 1 && $(autart[1]).text() != ' ') {
             artist = autart[1];
