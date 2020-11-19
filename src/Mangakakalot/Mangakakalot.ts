@@ -9,7 +9,7 @@ export class Mangakakalot extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.31'; }
+  get version(): string { return '0.0.32'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -40,24 +40,29 @@ export class Mangakakalot extends Source {
   getMangaDetailsRequest(ids: string[]): Request[] {
     let requests: Request[] = []
     for (let id of ids) {
-      let metadata = { 'id': id }
-      let url = ''
+      let idTemp = id.slice( id.indexOf( '/', id.indexOf('/') + 2 ), id.length )
+      let urlDomain = id.replace(idTemp, '')
+      let metadata = { 
+        'id': id,
+        'url': urlDomain,
+        'idTemp': idTemp
+      }
+      
+      /*let url = ''
       if ( id.includes('read-') )
         //url = `${Mangakakalot.getAbsoluteDomainUrl()}/`
         url = `${MK_DOMAIN}/`
       else {
         //url = `${Mangakakalot.getAbsoluteDomainUrl()}/manga/`
         url = `${MK_DOMAIN}/manga/`
-      }
-      //console.log(url)
-      //console.log(id)
+      }*/
       
       requests.push(createRequestObject({
-        url: url,
+        url: `${urlDomain}/`,
         //url: `${MK_DOMAIN}/manga/`,
         metadata: metadata,
         method: 'GET',
-        param: id
+        param: idTemp
       }))
     }
     return requests
@@ -65,6 +70,20 @@ export class Mangakakalot extends Source {
 
   getMangaDetails(data: any, metadata: any): Manga[] {
     let manga: Manga[] = []
+    if (metadata.id.toLowerCase().includes('mangakakalot')) {
+      console.log('Calling parseMangakakalotMangaDetails()')
+      manga = this.parseMangakakalotMangaDetails(data, metadata, manga)
+    }
+    else { // metadata.id.toLowerCase().includes('manganelo')
+      console.log('Calling parseManganeloMangaDetails()')
+      manga = this.parseManganeloMangaDetails(data, metadata, manga)
+    }
+
+    return manga
+  }
+
+  parseMangakakalotMangaDetails(data: any, metadata: any, manga: Manga[]): Manga[] {
+    console.log('Inside parseMangakakalotMangaDetails()')
     let $ = this.cheerio.load(data)
     let panel = $('.manga-info-top')
     let title = $('h1', panel).first().text() ?? ''
@@ -72,7 +91,7 @@ export class Mangakakalot extends Source {
     let table = $('.manga-info-text', panel)
     let author = '' // Updated below
     let artist = '' // Updated below
-    let autart = $('.manga-info-text li:nth-child(2)').text().replace('Author(s) :', '').replace(/\r?\n|\r/g, '').split(',  ')
+    let autart = $('.manga-info-text li:nth-child(2)').text().replace('Author(s) :', '').replace(/\r?\n|\r/g, '').split(', ')
     autart[autart.length-1] = autart[autart.length-1]?.replace(', ', '')
     author = autart[0]
     if (autart.length > 1 && $(autart[1]).text() != ' ') {
@@ -100,7 +119,7 @@ export class Mangakakalot extends Source {
     }
 
     // Date
-    let time = new Date($('.manga-info-text li:nth-child(4)').text().replace(/(-*(AM)*(PM)*)/g, '').replace('Last updated : ', '') )
+    let time = new Date($('.manga-info-text li:nth-child(4)').text().replace(/((AM)*(PM)*)/g, '').replace('Last updated : ', '') )
     lastUpdate = time.toDateString()
 
     // Alt Titles
@@ -123,6 +142,97 @@ export class Mangakakalot extends Source {
                     .end()  //again go back to selected element
                     .text().replace(/^\s+|\s+$/g, '')
     
+
+    manga.push(createManga({
+      id: metadata.id,
+      titles: titles,
+      image: image,
+      rating: Number(rating),
+      status: status,
+      artist: artist,
+      author: author,
+      tags: tagSections,
+      views: views,
+      follows: follows,
+      lastUpdate: lastUpdate,
+      desc: summary,
+      hentai: hentai
+    }))
+
+    return manga
+  }
+
+  // Function from Manganelo.ts
+  // https://github.com/Paperback-iOS/extensions-beta/blob/master/src/Manganelo/Manganelo.ts
+  parseManganeloMangaDetails(data: any, metadata: any, manga: Manga[]): Manga[] {
+    console.log('Inside parseManganeloMangaDetails()')
+    let $ = this.cheerio.load(data)
+    let panel = $('.panel-story-info')
+    let title = $('.img-loading', panel).attr('title') ?? ''
+    let image = $('.img-loading', panel).attr('src') ?? ''
+    let table = $('.variations-tableInfo', panel)
+    let author = ''
+    let artist = ''
+    let rating = 0
+    let status = MangaStatus.ONGOING
+    let titles = [title]
+    let follows = 0
+    let views = 0
+    let lastUpdate = ''
+    let hentai = false
+
+    let tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: [] })]
+
+    for (let row of $('tr', table).toArray()) {
+      if ($(row).find('.info-alternative').length > 0) {
+        let alts = $('h2', table).text().split(/,|;/)
+        for (let alt of alts) {
+          titles.push(alt.trim())
+        }
+      }
+      else if ($(row).find('.info-author').length > 0) {
+        let autart = $('.table-value', row).find('a').toArray()
+        author = $(autart[0]).text()
+        if (autart.length > 1) {
+          artist = $(autart[1]).text()
+        }
+      }
+      else if ($(row).find('.info-status').length > 0) {
+        status = $('.table-value', row).text() == 'Ongoing' ? MangaStatus.ONGOING : MangaStatus.COMPLETED
+      }
+      else if ($(row).find('.info-genres').length > 0) {
+        let elems = $('.table-value', row).find('a').toArray()
+        for (let elem of elems) {
+          let text = $(elem).text()
+          let id = $(elem).attr('href')?.split('/').pop()?.split('-').pop() ?? ''
+          if (text.toLowerCase().includes('smut')) {
+            hentai = true
+          }
+          tagSections[0].tags.push(createTag({ id: id, label: text }))
+        }
+      }
+    }
+
+    table = $('.story-info-right-extent', panel)
+    for (let row of $('p', table).toArray()) {
+      if ($(row).find('.info-time').length > 0) {
+        let time = new Date($('.stre-value', row).text().replace(/(-*(AM)*(PM)*)/g, ''))
+        lastUpdate = time.toDateString()
+      }
+      else if ($(row).find('.info-view').length > 0) {
+        views = Number($('.stre-value', row).text().replace(/,/g, ''))
+      }
+    }
+
+    rating = Number($('[property=v\\:average]', table).text())
+    follows = Number($('[property=v\\:votes]', table).text())
+    //let summary = $('.panel-story-info-description', panel).text()
+    let summary = $('.panel-story-info-description', panel)
+                    .clone()    //clone the element
+                    .children() //select all the children
+                    .remove()   //remove all the children
+                    .end()  //again go back to selected element
+                    .text().replace(/^\s+|\s+$/g, '')
 
     manga.push(createManga({
       id: metadata.id,
@@ -397,16 +507,20 @@ export class Mangakakalot extends Source {
     let updateManga: MangaTile[] = []
 
     for (let item of $('.item', '.owl-carousel').toArray()) {
-      let id2 = $('a', item).first().attr('href')?.split('/').pop() ?? ''
-      let id = $('div.slide-caption', item).children().last().attr('href')?.slice( $('div.slide-caption', item).children().last().attr('href')?.indexOf('chapter/'), $('div.slide-caption', item).children().last().attr('href')?.indexOf('/chapter_')).split('/').pop() ?? ''
+      let url = $('a', item).first().attr('href') ?? ''
+      //let id = url.slice( url.indexOf( '/', url.indexOf('/') + 2 ), url.length )
+      //let domain = url.replace(id, '')
+      // Redundant
+      /*let id = $('div.slide-caption', item).children().last().attr('href')?.slice( $('div.slide-caption', item).children().last().attr('href')?.indexOf('chapter/'), $('div.slide-caption', item).children().last().attr('href')?.indexOf('/chapter_')).split('/').pop() ?? ''
       if (id2 != id)
-        id = id2
+        id = id2*/
 
       let image = $('img', item).attr('src') ?? ''
       let title = $('div.slide-caption', item).children().first().text()
       let subtitle = $('div.slide-caption', item).children().last().text()
       topManga.push(createMangaTile({
-        id: id,
+        //id: id,
+        id: url,
         image: image,
         title: createIconText({ text: title }),
         subtitleText: createIconText({ text: subtitle })
@@ -414,13 +528,14 @@ export class Mangakakalot extends Source {
     }
 
     for (let item of $('.first', '.doreamon').toArray()) {
-      let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
-      
+      //let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
+      let url = $('a', item).first().attr('href') ?? ''
       let image = $('img', item).attr('src') ?? ''
       //let secondaryText = $('li:nth-child(2) > i', item).text() ?? ''
 
       updateManga.push(createMangaTile({
-        id: id,
+        //id: id,
+        id: url,
         image: image,
         title: createIconText({ text: $('h3', item).text() }),
         subtitleText: createIconText({ text: $('.sts_1', item).first().text() }),
