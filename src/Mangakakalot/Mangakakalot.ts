@@ -1,5 +1,5 @@
 import { /*Source,*/ Manga, MangaStatus, Chapter, ChapterDetails, HomeSectionRequest, HomeSection, MangaTile, SearchRequest, LanguageCode, TagSection, Request, MangaUpdates, PagedResults, SourceTag, TagType } from "paperback-extensions-common"
-import Manganelo from '../Manganelo'
+import { Manganelo } from '../Manganelo'
 
 const MK_DOMAIN = 'https://mangakakalot.com'
 let MK_IMAGE_DOMAIN = 'https://avt.mkklcdnv6.com/'
@@ -80,7 +80,8 @@ export class Mangakakalot extends Manganelo {
     }
     else { // metadata.id.toLowerCase().includes('manganelo')
       console.log('Calling parseManganeloMangaDetails()')
-      manga = this.parseManganeloMangaDetails(data, metadata, manga)
+      //manga = this.parseManganeloMangaDetails(data, metadata, manga)
+      manga = Manganelo.getMangaDetails(data, metadata)
     }
 
     return manga
