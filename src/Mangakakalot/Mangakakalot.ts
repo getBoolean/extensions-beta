@@ -10,7 +10,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.33'; }
+  get version(): string { return '0.0.35'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -75,21 +75,22 @@ export class Mangakakalot extends Manganelo {
   getMangaDetails(data: any, metadata: any): Manga[] {
     let manga: Manga[] = []
     if (metadata.id.toLowerCase().includes('mangakakalot')) {
-      console.log('Calling parseMangakakalotMangaDetails()')
-      manga = this.parseMangakakalotMangaDetails(data, metadata, manga)
+      //console.log('Calling parseMangakakalotMangaDetails()')
+      manga = this.parseMangakakalotMangaDetails(data, metadata)
     }
     else { // metadata.id.toLowerCase().includes('manganelo')
-      console.log('Calling parseManganeloMangaDetails()')
+      //console.log('Calling parseManganeloMangaDetails()')
       //manga = this.parseManganeloMangaDetails(data, metadata, manga)
-      manga = Manganelo.getMangaDetails(data, metadata)
+      manga = super.getMangaDetails(data, metadata)
     }
 
     return manga
   }
 
   // Done @getBoolean
-  parseMangakakalotMangaDetails(data: any, metadata: any, manga: Manga[]): Manga[] {
-    console.log('Inside parseMangakakalotMangaDetails()')
+  parseMangakakalotMangaDetails(data: any, metadata: any): Manga[] {
+    //console.log('Inside parseMangakakalotMangaDetails()')
+    let manga: Manga[] = []
     let $ = this.cheerio.load(data)
     let panel = $('.manga-info-top')
     let title = $('h1', panel).first().text() ?? ''
@@ -170,8 +171,9 @@ export class Mangakakalot extends Manganelo {
 
   // Function from Manganelo.ts
   // https://github.com/Paperback-iOS/extensions-beta/blob/master/src/Manganelo/Manganelo.ts
-  parseManganeloMangaDetails(data: any, metadata: any, manga: Manga[]): Manga[] {
-    console.log('Inside parseManganeloMangaDetails()')
+  /*parseManganeloMangaDetails(data: any, metadata: any): Manga[] {
+    //console.log('Inside parseManganeloMangaDetails()')
+    let manga: Manga[] = []
     let $ = this.cheerio.load(data)
     let panel = $('.panel-story-info')
     let title = $('.img-loading', panel).attr('title') ?? ''
@@ -259,7 +261,7 @@ export class Mangakakalot extends Manganelo {
     }))
 
     return manga
-  }
+  }*/
 
   // TODO: @getBoolean
   getChaptersRequest(mangaId: string): Request {
@@ -494,7 +496,7 @@ export class Mangakakalot extends Manganelo {
 
   // TODO: @getBoolean
   // Currently broken
-  private constructGetViewMoreRequest(key: string, page: number) {
+  constructGetViewMoreRequest(key: string, page: number) {
     let metadata = { page: page }
     let param = ''
     if (key == 'latest_updates') {
@@ -640,7 +642,7 @@ export class Mangakakalot extends Manganelo {
     });
   }
 
-  private isLastPage($: CheerioStatic): boolean {
+  isLastPage($: CheerioStatic): boolean {
     let current = $('.page-select').text();
     let total = $('.page-last').text();
 

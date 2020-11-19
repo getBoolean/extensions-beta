@@ -107,7 +107,15 @@ export class Manganelo extends Source {
 
     rating = Number($('[property=v\\:average]', table).text())
     follows = Number($('[property=v\\:votes]', table).text())
-    let summary = $('.panel-story-info-description', panel).text()
+    //let summary = $('.panel-story-info-description', panel).text()
+    // Exclude child text: https://www.viralpatel.net/jquery-get-text-element-without-child-element/
+    // Remove line breaks from start and end: https://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
+    let summary = $('.panel-story-info-description', panel)
+                    .clone()    //clone the element
+                    .children() //select all the children
+                    .remove()   //remove all the children
+                    .end()  //again go back to selected element
+                    .text().replace(/^\s+|\s+$/g, '')
 
     manga.push(createManga({
       id: metadata.id,
@@ -246,7 +254,7 @@ export class Manganelo extends Source {
     return createMangaUpdates(returnObject)
   }
 
-  private constructGetViewMoreRequest(key: string, page: number) {
+  constructGetViewMoreRequest(key: string, page: number) {
     let metadata = { page: page }
     let param = ''
     switch (key) {
@@ -530,7 +538,7 @@ export class Manganelo extends Source {
     })
   }
 
-  private isLastPage($: CheerioStatic): boolean {
+  isLastPage($: CheerioStatic): boolean {
     let current = $('.page-select').text();
     let total = $('.page-last').text();
 
