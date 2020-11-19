@@ -9,7 +9,7 @@ export class Mangakakalot extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.29'; }
+  get version(): string { return '0.0.31'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -17,8 +17,10 @@ export class Mangakakalot extends Source {
   get description(): string { return 'Extension that pulls manga from Mangakakalot' }
   get hentaiSource(): boolean { return false }
   getMangaShareUrl(mangaId: string): string | null { 
-    if ( mangaId.includes('read-'))
+    if ( mangaId.includes('read-')) {
+      //console.log(`${MK_DOMAIN}/${mangaId}`)
       return `${MK_DOMAIN}/${mangaId}`
+    }
     return `${MK_DOMAIN}/manga/${mangaId}` 
   }
   get websiteBaseURL(): string { return MK_DOMAIN }
@@ -41,9 +43,12 @@ export class Mangakakalot extends Source {
       let metadata = { 'id': id }
       let url = ''
       if ( id.includes('read-') )
+        //url = `${Mangakakalot.getAbsoluteDomainUrl()}/`
         url = `${MK_DOMAIN}/`
-      else
+      else {
+        //url = `${Mangakakalot.getAbsoluteDomainUrl()}/manga/`
         url = `${MK_DOMAIN}/manga/`
+      }
       //console.log(url)
       //console.log(id)
       
