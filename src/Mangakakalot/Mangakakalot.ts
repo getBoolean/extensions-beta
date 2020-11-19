@@ -9,7 +9,7 @@ export class Mangakakalot extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.27'; }
+  get version(): string { return '0.0.28'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -417,8 +417,8 @@ export class Mangakakalot extends Source {
       updateManga.push(createMangaTile({
         id: id,
         image: image,
-        title: createIconText({ text: $('a', item).first().text() }),
-        subtitleText: createIconText({ text: $('.item-author', item).text() }),
+        title: createIconText({ text: $('h3', item).text() }),
+        subtitleText: createIconText({ text: $('.sts_1', item).first().text() }),
         primaryText: createIconText({ text: $('.genres-item-rate', item).text(), icon: 'star.fill' }),
         secondaryText: createIconText({ text: $('i', latestUpdate).text(), icon: 'clock.fill' })
       }))
