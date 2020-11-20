@@ -3,7 +3,8 @@ import { Manganelo } from '../Manganelo'
 
 const MK_DOMAIN = 'https://mangakakalot.com'
 const MN_DOMAIN = 'https://manganelo.com'
-let MK_IMAGE_DOMAIN = 'https://avt.mkklcdnv6.com/'
+let MN_IMAGE_DOMAIN = 'https://avt.mkklcdnv6.com/'
+let MK_IMAGE_DOMAIN = 'https://s5.mkklcdnv5.com/'
 
 export class Mangakakalot extends Manganelo {
   constructor(cheerio: CheerioAPI) {
