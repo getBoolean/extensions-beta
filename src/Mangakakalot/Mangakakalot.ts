@@ -10,11 +10,12 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.35'; }
+  get version(): string { return '0.1.0'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
   get authorWebsite(): string { return 'https://github.com/getBoolean' }
+  get language(): string { return 'English' }
   get description(): string { return 'Extension that pulls manga from Mangakakalot' }
   get hentaiSource(): boolean { return false }
   getMangaShareUrl(mangaId: string): string | null { 
@@ -51,15 +52,6 @@ export class Mangakakalot extends Manganelo {
         'idTemp': idTemp
       }
       
-      /*let url = ''
-      if ( id.includes('read-') )
-        //url = `${Mangakakalot.getAbsoluteDomainUrl()}/`
-        url = `${MK_DOMAIN}/`
-      else {
-        //url = `${Mangakakalot.getAbsoluteDomainUrl()}/manga/`
-        url = `${MK_DOMAIN}/manga/`
-      }*/
-      
       requests.push(createRequestObject({
         url: `${urlDomain}/`,
         //url: `${MK_DOMAIN}/manga/`,
@@ -75,12 +67,9 @@ export class Mangakakalot extends Manganelo {
   getMangaDetails(data: any, metadata: any): Manga[] {
     let manga: Manga[] = []
     if (metadata.id.toLowerCase().includes('mangakakalot')) {
-      //console.log('Calling parseMangakakalotMangaDetails()')
       manga = this.parseMangakakalotMangaDetails(data, metadata)
     }
     else { // metadata.id.toLowerCase().includes('manganelo')
-      //console.log('Calling parseManganeloMangaDetails()')
-      //manga = this.parseManganeloMangaDetails(data, metadata, manga)
       manga = super.getMangaDetails(data, metadata)
     }
 
@@ -169,96 +158,110 @@ export class Mangakakalot extends Manganelo {
     return manga
   }
 
-  // TODO: @getBoolean
+  // Done @getBoolean
   getChaptersRequest(mangaId: string): Request {
-    let metadata = { 'id': mangaId }
-    let url = ''
-    if ( mangaId.includes('read-') )
-        url = `${MK_DOMAIN}/`
-      else
-        url = `${MK_DOMAIN}/manga/`
+    let idTemp = mangaId.slice( mangaId.indexOf( '/', mangaId.indexOf('/') + 2 ), mangaId.length )
+    let urlDomain = mangaId.replace(idTemp, '')
+    let metadata = {
+      'url': urlDomain, // https://mangakakalot.com
+      'id': mangaId,    // https://mangakakalot.com/read-oo1zd158524527909
+      'idTemp': idTemp  // /read-oo1zd158524527909
+    }
+
     return createRequestObject({
-      url: url,
-      method: "GET",
+      url: `${urlDomain}/`,
       metadata: metadata,
-      headers: {
-        "content-type": "application/x-www-form-urlencoded"
-      },
-      param: mangaId
-    })
+      method: 'GET',
+      param: idTemp
+   })
   }
 
-  // TODO: @getBoolean
+  // Done @getBoolean
   getChapters(data: any, metadata: any): Chapter[] {
-    let $ = this.cheerio.load(data)
-    let chapterJS: any[] = JSON.parse(($.root().html()?.match(/vm.Chapters = (.*);/) ?? [])[1]).reverse()
     let chapters: Chapter[] = []
-    // following the url encoding that the website uses, same variables too
-    chapterJS.forEach((elem: any) => {
-      let chapterCode: string = elem.Chapter
-      let vol = Number(chapterCode.substring(0, 1))
-      let index = vol != 1 ? '-index-' + vol : ''
-      let n = parseInt(chapterCode.slice(1, -1))
-      let a = Number(chapterCode[chapterCode.length - 1])
-      let m = a != 0 ? '.' + a : ''
-      let id = metadata.id + '-chapter-' + n + m + index + '.html'
-      let chNum = n + a * .1
-      let name = elem.ChapterName ? elem.ChapterName : '' // can be null
-      let time = Date.parse(elem.Date.replace(" ", "T"))
-
-      chapters.push(createChapter({
-        id: id,
-        mangaId: metadata.id,
-        name: name,
-        chapNum: chNum,
-        langCode: LanguageCode.ENGLISH,
-        time: isNaN(time) ? new Date() : new Date(time)
-      }))
-    })
+    if (metadata.id.toLowerCase().includes('mangakakalot')) {
+      chapters = this.getMangakakalotChapters(data, metadata)
+    }
+    else { // metadata.id.toLowerCase().includes('manganelo')
+      chapters = super.getChapters(data, metadata)
+    }
 
     return chapters
   }
 
-  // TODO: @getBoolean
+  // Done @getBoolean
+  getMangakakalotChapters(data: any, metadata: any): Chapter[] {
+    let $ = this.cheerio.load(data)
+    let allChapters = $('.chapter-list', '.leftCol')
+    let chapters: Chapter[] = []
+
+    for (let chapter of $('.row', allChapters).toArray()) {
+      //let id: string = $('a', chapter).attr('href')?.split('/').pop() ?? ''
+      let id: string = $('a', chapter).attr('href') ?? ''
+      let name: string = $('a', chapter).text() ?? ''
+      let chNum: number = Number((/Chapter (\d*)/g.exec(name) ?? [])[1] ?? '')
+      let time: Date = new Date($('span:nth-child(3)', chapter).attr('title') ?? '')
+      chapters.push(createChapter({
+        id: id,
+        mangaId: metadata.id,
+        name: name,
+        langCode: LanguageCode.ENGLISH,
+        chapNum: chNum,
+        time: time
+      }))
+    }
+    
+    return chapters
+  }
+
+  // Done @getBoolean
   getChapterDetailsRequest(mangaId: string, chapId: string): Request {
-    let metadata = { 'mangaId': mangaId, 'chapterId': chapId, 'nextPage': false, 'page': 1 }
+    let metadata = {
+      'mangaId': mangaId,
+      'chapterId': chapId,
+      'nextPage': false,
+      'page': 1
+    }
+
     return createRequestObject({
-      url: `${MK_DOMAIN}/read-online/`,
+      url: `${mangaId}/`,
+      method: "GET",
       metadata: metadata,
-      headers: {
-        "content-type": "application/x-www-form-urlencoded"
-      },
-      method: 'GET',
-      param: chapId
+      param: `${chapId}`
     })
   }
 
-  // TODO: @getBoolean
+  // Done @getBoolean
   getChapterDetails(data: any, metadata: any): ChapterDetails {
+    let chapterDetails : ChapterDetails
+    if (metadata.mangaId.toLowerCase().includes('mangakakalot')) {
+      chapterDetails = this.getMangakakalotChapterDetails(data, metadata)
+    }
+    else { // metadata.mangaId.toLowerCase().includes('manganelo')
+      chapterDetails = super.getChapterDetails(data, metadata)
+    }
+
+    return chapterDetails
+  }
+
+  // Done @getBoolean
+  getMangakakalotChapterDetails(data: any, metadata: any): ChapterDetails {
+    let $ = this.cheerio.load(data)
     let pages: string[] = []
-    let pathName = JSON.parse((data.match(/vm.CurPathName = (.*);/) ?? [])[1])
-    let chapterInfo = JSON.parse((data.match(/vm.CurChapter = (.*);/) ?? [])[1])
-    let pageNum = Number(chapterInfo.Page)
-
-    let chapter = chapterInfo.Chapter.slice(1, -1)
-    let odd = chapterInfo.Chapter[chapterInfo.Chapter.length - 1]
-    let chapterImage = odd == 0 ? chapter : chapter + '.' + odd
-
-    for (let i = 0; i < pageNum; i++) {
-      let s = '000' + (i + 1)
-      let page = s.substr(s.length - 3)
-      pages.push(`https://${pathName}/manga/${metadata.mangaId}/${chapterInfo.Directory == '' ? '' : chapterInfo.Directory + '/'}${chapterImage}-${page}.png`)
+    for (let item of $('img', '.vung-doc').toArray()) {
+      pages.push($(item).attr('src') ?? '')
     }
 
     let chapterDetails = createChapterDetails({
       id: metadata.chapterId,
       mangaId: metadata.mangaId,
-      pages, longStrip: false
+      pages: pages,
+      longStrip: false
     })
 
     return chapterDetails
   }
-
+/*
   // TODO: @getBoolean
   filterUpdatedMangaRequest(ids: any, time: Date): Request {
     let metadata = { 'ids': ids, 'referenceTime': time }
@@ -287,7 +290,7 @@ export class Mangakakalot extends Manganelo {
 
     return createMangaUpdates(returnObject)
   }
-
+*/
   // TODO: @getBoolean
   searchRequest(query: SearchRequest): Request | null {
     let status = ""

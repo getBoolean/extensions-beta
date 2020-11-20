@@ -18,7 +18,7 @@ export class Manganelo extends Source {
   get hentaiSource(): boolean { return false }
   getMangaShareUrl(mangaId: string): string | null { return `${MN_DOMAIN}/manga/${mangaId}` }
   get websiteBaseURL(): string { return MN_DOMAIN }
-  get rateLimit(): Number {
+  get rateLimit(): number {
     return 2
   }
 
