@@ -2,6 +2,7 @@ import { /*Source,*/ Manga, MangaStatus, Chapter, ChapterDetails, HomeSectionReq
 import { Manganelo } from '../Manganelo'
 
 const MK_DOMAIN = 'https://mangakakalot.com'
+const MN_DOMAIN = 'https://manganelo.com'
 let MK_IMAGE_DOMAIN = 'https://avt.mkklcdnv6.com/'
 
 export class Mangakakalot extends Manganelo {
@@ -10,7 +11,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.1.9'; }
+  get version(): string { return '0.1.11'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -218,6 +219,7 @@ export class Mangakakalot extends Manganelo {
     return chapters
   }
 
+  // Need to add headers
   // TODO @getBoolean
   getChapterDetailsRequest(mangaId: string, chapId: string): Request {
     console.log('in getChapterDetailsRequest()')
@@ -239,9 +241,9 @@ export class Mangakakalot extends Manganelo {
       method: "GET",
       metadata: metadata,
       headers: {
-        'referer': 'https://manganelo.com',
-        "content-type": "application/x-www-form-urlencoded",
-        Cookie: 'content_lazyload=off'
+        'Referer': 'https://mangakakalot.com/',
+        'content-type': 'application/x-www-form-urlencoded',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36'
       },
       param: `${mangaCode}/${tempChapId}`
     })
@@ -250,7 +252,7 @@ export class Mangakakalot extends Manganelo {
   // TODO @getBoolean
   getChapterDetails(data: any, metadata: any): ChapterDetails {
     let chapterDetails : ChapterDetails
-    console.log('mangaId: ' + metadata.mangaId)
+    console.log('metadata.mangaId: ' + metadata.mangaId)
     if (metadata.mangaId.toLowerCase().includes('mangakakalot')) {
       console.log('Entering this.getMangakakalotChapterDetails()')
       chapterDetails = this.getMangakakalotChapterDetails(data, metadata)
@@ -572,6 +574,32 @@ export class Mangakakalot extends Manganelo {
       nextPage: nextPage
     });
   }
+
+  /**
+   * Manganelo image requests for older chapters and pages are required to have a referer to it's host
+   * @param request
+   */
+  requestModifier(request: Request): Request {
+
+    let headers: any = request.headers == undefined ? {} : request.headers
+    headers['Referer'] = `${MN_DOMAIN}`
+
+    return createRequestObject({
+      url: request.url,
+      method: request.method,
+      headers: headers,
+      data: request.data,
+      metadata: request.metadata,
+      timeout: request.timeout,
+      param: request.param,
+      cookies: request.cookies,
+      incognito: request.incognito
+    })
+  }
+
+
+
+  
 
   isLastPage($: CheerioStatic): boolean {
     let current = $('.page-select').text();
