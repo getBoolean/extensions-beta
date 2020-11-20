@@ -2686,7 +2686,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.1.17'; }
+    get version() { return '0.1.18'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2904,17 +2904,19 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     // TODO @getBoolean
     getChapterDetails(data, metadata) {
         console.log('Inside getChapterDetails()');
-        let chapterDetails;
+        //let chapterDetails : ChapterDetails
         console.log('metadata.mangaId: ' + metadata.mangaId);
         if (metadata.mangaId.toLowerCase().includes('mangakakalot')) {
             console.log('Entering this.getMangakakalotChapterDetails()');
-            chapterDetails = this.getMangakakalotChapterDetails(data, metadata);
+            // chapterDetails = this.getMangakakalotChapterDetails(data, metadata)
+            return this.getMangakakalotChapterDetails(data, metadata);
         }
         else { // metadata.mangaId.toLowerCase().includes('manganelo')
             console.log('Entering super.getChapterDetails()');
-            chapterDetails = super.getChapterDetails(data, metadata);
+            // chapterDetails = super.getChapterDetails(data, metadata)
+            return super.getChapterDetails(data, metadata);
         }
-        return chapterDetails;
+        //return chapterDetails
     }
     // TODO @getBoolean
     getMangakakalotChapterDetails(data, metadata) {
@@ -2928,13 +2930,14 @@ class Mangakakalot extends Manganelo_1.Manganelo {
             pages.push(imageUrl);
             console.log('Pushing image url: ' + imageUrl);
         }
-        let chapterDetails = createChapterDetails({
+        //let chapterDetails = createChapterDetails({
+        return createChapterDetails({
             id: metadata.chapterId,
             mangaId: metadata.mangaId,
             pages: pages,
             longStrip: false
         });
-        return chapterDetails;
+        //return chapterDetails
     }
     /*
       // TODO: @getBoolean
