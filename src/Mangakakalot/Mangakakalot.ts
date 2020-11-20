@@ -10,7 +10,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.1.0'; }
+  get version(): string { return '0.1.2'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -195,12 +195,13 @@ export class Mangakakalot extends Manganelo {
     let allChapters = $('.chapter-list', '.leftCol')
     let chapters: Chapter[] = []
 
+    // volume is commented out because it doesn't sort properly.
     for (let chapter of $('.row', allChapters).toArray()) {
       let id: string = $('a', chapter).attr('href') ?? ''
       let text: string = $('a', chapter).text() ?? ''
       let chNum = Number( id.split('_').pop() )
-      let volume = Number ( text.includes('Vol.') ? text.slice( text.indexOf('Vol.') + 4, text.indexOf(' ')) : '')
-      let name: string = text.includes(': ') ? text.slice(text.indexOf(': ') + 2, text.length) : ''
+      //let volume = Number ( text.includes('Vol.') ? text.slice( text.indexOf('Vol.') + 4, text.indexOf(' ')) : '')
+      let name: string = text //text.includes(': ') ? text.slice(text.indexOf(': ') + 2, text.length) : ''
       
       let time = Date.parse($('span:nth-child(3)', chapter).attr('title') ?? '')
       chapters.push(createChapter({
@@ -209,7 +210,7 @@ export class Mangakakalot extends Manganelo {
         name: name,
         langCode: LanguageCode.ENGLISH,
         chapNum: chNum,
-        volume: Number.isNaN(volume) ? 0 : volume,
+        //volume: Number.isNaN(volume) ? 0 : volume,
         time: isNaN(time) ? new Date() : new Date(time)
       }))
     }
