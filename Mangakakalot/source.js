@@ -2684,11 +2684,12 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.0.35'; }
+    get version() { return '0.1.0'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
     get authorWebsite() { return 'https://github.com/getBoolean'; }
+    get language() { return 'English'; }
     get description() { return 'Extension that pulls manga from Mangakakalot'; }
     get hentaiSource() { return false; }
     getMangaShareUrl(mangaId) {
@@ -2722,14 +2723,6 @@ class Mangakakalot extends Manganelo_1.Manganelo {
                 'url': urlDomain,
                 'idTemp': idTemp
             };
-            /*let url = ''
-            if ( id.includes('read-') )
-              //url = `${Mangakakalot.getAbsoluteDomainUrl()}/`
-              url = `${MK_DOMAIN}/`
-            else {
-              //url = `${Mangakakalot.getAbsoluteDomainUrl()}/manga/`
-              url = `${MK_DOMAIN}/manga/`
-            }*/
             requests.push(createRequestObject({
                 url: `${urlDomain}/`,
                 //url: `${MK_DOMAIN}/manga/`,
@@ -2744,12 +2737,9 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     getMangaDetails(data, metadata) {
         let manga = [];
         if (metadata.id.toLowerCase().includes('mangakakalot')) {
-            //console.log('Calling parseMangakakalotMangaDetails()')
             manga = this.parseMangakakalotMangaDetails(data, metadata);
         }
         else { // metadata.id.toLowerCase().includes('manganelo')
-            //console.log('Calling parseManganeloMangaDetails()')
-            //manga = this.parseManganeloMangaDetails(data, metadata, manga)
             manga = super.getMangaDetails(data, metadata);
         }
         return manga;
@@ -2827,115 +2817,128 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         }));
         return manga;
     }
-    // TODO: @getBoolean
+    // Done @getBoolean
     getChaptersRequest(mangaId) {
-        let metadata = { 'id': mangaId };
-        let url = '';
-        if (mangaId.includes('read-'))
-            url = `${MK_DOMAIN}/`;
-        else
-            url = `${MK_DOMAIN}/manga/`;
+        let idTemp = mangaId.slice(mangaId.indexOf('/', mangaId.indexOf('/') + 2), mangaId.length);
+        let urlDomain = mangaId.replace(idTemp, '');
+        let metadata = {
+            'url': urlDomain,
+            'id': mangaId,
+            'idTemp': idTemp // /read-oo1zd158524527909
+        };
         return createRequestObject({
-            url: url,
-            method: "GET",
+            url: `${urlDomain}/`,
             metadata: metadata,
-            headers: {
-                "content-type": "application/x-www-form-urlencoded"
-            },
-            param: mangaId
+            method: 'GET',
+            param: idTemp
         });
     }
-    // TODO: @getBoolean
+    // Done @getBoolean
     getChapters(data, metadata) {
-        var _a, _b;
-        let $ = this.cheerio.load(data);
-        let chapterJS = JSON.parse(((_b = (_a = $.root().html()) === null || _a === void 0 ? void 0 : _a.match(/vm.Chapters = (.*);/)) !== null && _b !== void 0 ? _b : [])[1]).reverse();
         let chapters = [];
-        // following the url encoding that the website uses, same variables too
-        chapterJS.forEach((elem) => {
-            let chapterCode = elem.Chapter;
-            let vol = Number(chapterCode.substring(0, 1));
-            let index = vol != 1 ? '-index-' + vol : '';
-            let n = parseInt(chapterCode.slice(1, -1));
-            let a = Number(chapterCode[chapterCode.length - 1]);
-            let m = a != 0 ? '.' + a : '';
-            let id = metadata.id + '-chapter-' + n + m + index + '.html';
-            let chNum = n + a * .1;
-            let name = elem.ChapterName ? elem.ChapterName : ''; // can be null
-            let time = Date.parse(elem.Date.replace(" ", "T"));
+        if (metadata.id.toLowerCase().includes('mangakakalot')) {
+            chapters = this.getMangakakalotChapters(data, metadata);
+        }
+        else { // metadata.id.toLowerCase().includes('manganelo')
+            chapters = super.getChapters(data, metadata);
+        }
+        return chapters;
+    }
+    // Done @getBoolean
+    getMangakakalotChapters(data, metadata) {
+        var _a, _b, _c, _d, _e;
+        let $ = this.cheerio.load(data);
+        let allChapters = $('.chapter-list', '.leftCol');
+        let chapters = [];
+        for (let chapter of $('.row', allChapters).toArray()) {
+            //let id: string = $('a', chapter).attr('href')?.split('/').pop() ?? ''
+            let id = (_a = $('a', chapter).attr('href')) !== null && _a !== void 0 ? _a : '';
+            let name = (_b = $('a', chapter).text()) !== null && _b !== void 0 ? _b : '';
+            let chNum = Number((_d = ((_c = /Chapter (\d*)/g.exec(name)) !== null && _c !== void 0 ? _c : [])[1]) !== null && _d !== void 0 ? _d : '');
+            let time = new Date((_e = $('span:nth-child(3)', chapter).attr('title')) !== null && _e !== void 0 ? _e : '');
             chapters.push(createChapter({
                 id: id,
                 mangaId: metadata.id,
                 name: name,
-                chapNum: chNum,
                 langCode: paperback_extensions_common_1.LanguageCode.ENGLISH,
-                time: isNaN(time) ? new Date() : new Date(time)
+                chapNum: chNum,
+                time: time
             }));
-        });
+        }
         return chapters;
     }
-    // TODO: @getBoolean
+    // Done @getBoolean
     getChapterDetailsRequest(mangaId, chapId) {
-        let metadata = { 'mangaId': mangaId, 'chapterId': chapId, 'nextPage': false, 'page': 1 };
+        let metadata = {
+            'mangaId': mangaId,
+            'chapterId': chapId,
+            'nextPage': false,
+            'page': 1
+        };
         return createRequestObject({
-            url: `${MK_DOMAIN}/read-online/`,
+            url: `${mangaId}/`,
+            method: "GET",
             metadata: metadata,
-            headers: {
-                "content-type": "application/x-www-form-urlencoded"
-            },
-            method: 'GET',
-            param: chapId
+            param: `${chapId}`
         });
     }
-    // TODO: @getBoolean
+    // Done @getBoolean
     getChapterDetails(data, metadata) {
-        var _a, _b;
+        let chapterDetails;
+        if (metadata.mangaId.toLowerCase().includes('mangakakalot')) {
+            chapterDetails = this.getMangakakalotChapterDetails(data, metadata);
+        }
+        else { // metadata.mangaId.toLowerCase().includes('manganelo')
+            chapterDetails = super.getChapterDetails(data, metadata);
+        }
+        return chapterDetails;
+    }
+    // Done @getBoolean
+    getMangakakalotChapterDetails(data, metadata) {
+        var _a;
+        let $ = this.cheerio.load(data);
         let pages = [];
-        let pathName = JSON.parse(((_a = data.match(/vm.CurPathName = (.*);/)) !== null && _a !== void 0 ? _a : [])[1]);
-        let chapterInfo = JSON.parse(((_b = data.match(/vm.CurChapter = (.*);/)) !== null && _b !== void 0 ? _b : [])[1]);
-        let pageNum = Number(chapterInfo.Page);
-        let chapter = chapterInfo.Chapter.slice(1, -1);
-        let odd = chapterInfo.Chapter[chapterInfo.Chapter.length - 1];
-        let chapterImage = odd == 0 ? chapter : chapter + '.' + odd;
-        for (let i = 0; i < pageNum; i++) {
-            let s = '000' + (i + 1);
-            let page = s.substr(s.length - 3);
-            pages.push(`https://${pathName}/manga/${metadata.mangaId}/${chapterInfo.Directory == '' ? '' : chapterInfo.Directory + '/'}${chapterImage}-${page}.png`);
+        for (let item of $('img', '.vung-doc').toArray()) {
+            pages.push((_a = $(item).attr('src')) !== null && _a !== void 0 ? _a : '');
         }
         let chapterDetails = createChapterDetails({
             id: metadata.chapterId,
             mangaId: metadata.mangaId,
-            pages, longStrip: false
+            pages: pages,
+            longStrip: false
         });
         return chapterDetails;
     }
-    // TODO: @getBoolean
-    filterUpdatedMangaRequest(ids, time) {
-        let metadata = { 'ids': ids, 'referenceTime': time };
+    /*
+      // TODO: @getBoolean
+      filterUpdatedMangaRequest(ids: any, time: Date): Request {
+        let metadata = { 'ids': ids, 'referenceTime': time }
         return createRequestObject({
-            url: `${MK_DOMAIN}/`,
-            metadata: metadata,
-            headers: {
-                "content-type": "application/x-www-form-urlencoded"
-            },
-            method: "GET"
-        });
-    }
-    // TODO: @getBoolean
-    filterUpdatedManga(data, metadata) {
-        var _a;
-        let $ = this.cheerio.load(data);
+          url: `${MK_DOMAIN}/`,
+          metadata: metadata,
+          headers: {
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          method: "GET"
+        })
+      }
+    
+      // TODO: @getBoolean
+      filterUpdatedManga(data: any, metadata: any): MangaUpdates {
+        let $ = this.cheerio.load(data)
+    
         // Because this source parses JSON, there is never any additional pages to parse
-        let returnObject = {
-            'ids': []
-        };
-        let updateManga = JSON.parse(((_a = data.match(/vm.LatestJSON = (.*);/)) !== null && _a !== void 0 ? _a : [])[1]);
-        updateManga.forEach((elem) => {
-            if (metadata.ids.includes(elem.IndexName) && metadata.referenceTime < new Date(elem.Date))
-                returnObject.ids.push(elem.IndexName);
-        });
-        return createMangaUpdates(returnObject);
-    }
+        let returnObject: MangaUpdates = {
+          'ids': []
+        }
+        let updateManga = JSON.parse((data.match(/vm.LatestJSON = (.*);/) ?? [])[1])
+        updateManga.forEach((elem: any) => {
+          if (metadata.ids.includes(elem.IndexName) && metadata.referenceTime < new Date(elem.Date)) returnObject.ids.push(elem.IndexName)
+        })
+    
+        return createMangaUpdates(returnObject)
+      }
+    */
     // TODO: @getBoolean
     searchRequest(query) {
         let status = "";
