@@ -218,7 +218,7 @@ export class Mangakakalot extends Manganelo {
     return chapters
   }
 
-  // Done @getBoolean
+  // TODO @getBoolean
   getChapterDetailsRequest(mangaId: string, chapId: string): Request {
     let metadata = {
       'mangaId': mangaId,
@@ -235,7 +235,7 @@ export class Mangakakalot extends Manganelo {
     })
   }
 
-  // Done @getBoolean
+  // TODO @getBoolean
   getChapterDetails(data: any, metadata: any): ChapterDetails {
     let chapterDetails : ChapterDetails
     if (metadata.mangaId.toLowerCase().includes('mangakakalot')) {
@@ -248,7 +248,7 @@ export class Mangakakalot extends Manganelo {
     return chapterDetails
   }
 
-  // Done @getBoolean
+  // TODO @getBoolean
   getMangakakalotChapterDetails(data: any, metadata: any): ChapterDetails {
     let $ = this.cheerio.load(data)
     let pages: string[] = []
