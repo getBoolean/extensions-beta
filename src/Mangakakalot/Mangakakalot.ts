@@ -12,7 +12,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.1.17'; }
+  get version(): string { return '0.1.18'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -253,18 +253,20 @@ export class Mangakakalot extends Manganelo {
   // TODO @getBoolean
   getChapterDetails(data: any, metadata: any): ChapterDetails {
     console.log('Inside getChapterDetails()')
-    let chapterDetails : ChapterDetails
+    //let chapterDetails : ChapterDetails
     console.log('metadata.mangaId: ' + metadata.mangaId)
     if (metadata.mangaId.toLowerCase().includes('mangakakalot')) {
       console.log('Entering this.getMangakakalotChapterDetails()')
-      chapterDetails = this.getMangakakalotChapterDetails(data, metadata)
+      // chapterDetails = this.getMangakakalotChapterDetails(data, metadata)
+      return this.getMangakakalotChapterDetails(data, metadata)
     }
     else { // metadata.mangaId.toLowerCase().includes('manganelo')
       console.log('Entering super.getChapterDetails()')
-      chapterDetails = super.getChapterDetails(data, metadata)
+      // chapterDetails = super.getChapterDetails(data, metadata)
+      return super.getChapterDetails(data, metadata)
     }
 
-    return chapterDetails
+    //return chapterDetails
   }
 
   // TODO @getBoolean
@@ -279,14 +281,15 @@ export class Mangakakalot extends Manganelo {
       console.log('Pushing image url: ' + imageUrl)
     }
 
-    let chapterDetails = createChapterDetails({
+    //let chapterDetails = createChapterDetails({
+    return createChapterDetails({
       id: metadata.chapterId,
       mangaId: metadata.mangaId,
       pages: pages,
       longStrip: false
     })
 
-    return chapterDetails
+    //return chapterDetails
   }
 /*
   // TODO: @getBoolean
