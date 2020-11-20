@@ -2686,7 +2686,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.1.14'; }
+    get version() { return '0.1.15'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2893,28 +2893,11 @@ class Mangakakalot extends Manganelo_1.Manganelo {
             //url: `${urlDomain}/chapter/`,
             url: `${chapId}`,
             method: "GET",
-            metadata: metadata,
+            metadata: metadata /*,
             headers: {
-                'Referer': 'https://mangakakalot.com/',
-                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36'
-                /*
-                'content-type': 'application/x-www-form-urlencoded',
-                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36'
-                //'authority': 's5.mkklcdnv5.com',
-                'method': 'GET',
-                //'path': '/mangakakalot/q2/qw924246/chapter_1/1.jpg',
-                'scheme': 'https',*/
-                //'accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
-                /*'accept-encoding': 'gzip, deflate, br',
-                'accept-language': 'en-US,en;q=0.9',
-                'cache-control': 'no-cache',
-                'pragma': 'no-cache',
-                'referer': 'https://mangakakalot.com/',
-                'sec-fetch-dest': 'image',
-                'sec-fetch-mode': 'no-cors',
-                'sec-fetch-site': 'cross-site',
-                */
-            } //,
+              'Referer': 'https://mangakakalot.com/',
+              'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36'
+            }*/ //,
             //param: `${mangaCode}/${tempChapId}`
         });
     }
@@ -3231,6 +3214,8 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     requestModifier(request) {
         let headers = request.headers == undefined ? {} : request.headers;
         headers['Referer'] = `${MK_DOMAIN}`;
+        headers['user-agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36';
+        request.timeout = 10;
         return createRequestObject({
             url: request.url,
             method: request.method,
