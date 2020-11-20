@@ -10,7 +10,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.1.2'; }
+  get version(): string { return '0.1.8'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -220,28 +220,38 @@ export class Mangakakalot extends Manganelo {
 
   // TODO @getBoolean
   getChapterDetailsRequest(mangaId: string, chapId: string): Request {
+    console.log('in getChapterDetailsRequest()')
+    let mangaIdTemp = mangaId.slice( mangaId.indexOf( '/', mangaId.indexOf('/') + 2 ), mangaId.length )
+    let mangaCode = chapId.slice( chapId.indexOf('chapter/') + 8, chapId.indexOf('/chapter_'))
+    let urlDomain = mangaId.replace(mangaIdTemp, '')
+    let tempChapId = chapId.split('/').pop() ?? chapId
     let metadata = {
       'mangaId': mangaId,
-      'chapterId': chapId,
+      'chapterId': tempChapId,
       'nextPage': false,
       'page': 1
     }
+    console.log('url: ' + `${urlDomain}/chapter/`)
+    console.log('param: ' + `${mangaCode}/${tempChapId}`)
 
     return createRequestObject({
-      url: `${mangaId}/`,
+      url: `${urlDomain}/chapter/`,
       method: "GET",
       metadata: metadata,
-      param: `${chapId}`
+      param: `${mangaCode}/${tempChapId}`
     })
   }
 
   // TODO @getBoolean
   getChapterDetails(data: any, metadata: any): ChapterDetails {
     let chapterDetails : ChapterDetails
+    console.log('mangaId: ' + metadata.mangaId)
     if (metadata.mangaId.toLowerCase().includes('mangakakalot')) {
+      console.log('Entering this.getMangakakalotChapterDetails()')
       chapterDetails = this.getMangakakalotChapterDetails(data, metadata)
     }
     else { // metadata.mangaId.toLowerCase().includes('manganelo')
+      console.log('Entering super.getChapterDetails()')
       chapterDetails = super.getChapterDetails(data, metadata)
     }
 
@@ -250,10 +260,13 @@ export class Mangakakalot extends Manganelo {
 
   // TODO @getBoolean
   getMangakakalotChapterDetails(data: any, metadata: any): ChapterDetails {
+    console.log('In getMangakakalotChapterDetails()')
     let $ = this.cheerio.load(data)
     let pages: string[] = []
     for (let item of $('img', '.vung-doc').toArray()) {
-      pages.push($(item).attr('src') ?? '')
+      let imageUrl = $(item).attr('src') ?? ''
+      pages.push(imageUrl)
+      console.log('Pushing image url: ' + imageUrl)
     }
 
     let chapterDetails = createChapterDetails({
