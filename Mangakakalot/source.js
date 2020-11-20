@@ -2684,7 +2684,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.1.8'; }
+    get version() { return '0.1.9'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2890,6 +2890,11 @@ class Mangakakalot extends Manganelo_1.Manganelo {
             url: `${urlDomain}/chapter/`,
             method: "GET",
             metadata: metadata,
+            headers: {
+                'referer': 'https://manganelo.com',
+                "content-type": "application/x-www-form-urlencoded",
+                Cookie: 'content_lazyload=off'
+            },
             param: `${mangaCode}/${tempChapId}`
         });
     }
