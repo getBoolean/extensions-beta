@@ -196,11 +196,11 @@ export class Mangakakalot extends Manganelo {
     let chapters: Chapter[] = []
 
     for (let chapter of $('.row', allChapters).toArray()) {
-      //let id: string = $('a', chapter).attr('href')?.split('/').pop() ?? ''
       let id: string = $('a', chapter).attr('href') ?? ''
-      let name: string = $('a', chapter).text() ?? ''
-      let chNum: number = Number((/Chapter (\d*)/g.exec(name) ?? [])[1] ?? '')
-      let time: Date = new Date($('span:nth-child(3)', chapter).attr('title') ?? '')
+      let text: string = $('a', chapter).text() ?? ''
+      let chNum = Number( id.split('_').pop() )
+      let name: string = text.includes(': ') ? text.slice(text.indexOf(': ') + 2, text.length) : ''
+      
       chapters.push(createChapter({
         id: id,
         mangaId: metadata.id,
@@ -208,6 +208,7 @@ export class Mangakakalot extends Manganelo {
         langCode: LanguageCode.ENGLISH,
         chapNum: chNum,
         time: time
+        volume: Number.isNaN(volume) ? 0 : volume,
       }))
     }
     
