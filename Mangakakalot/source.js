@@ -2870,7 +2870,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         }
         return chapters;
     }
-    // Done @getBoolean
+    // TODO @getBoolean
     getChapterDetailsRequest(mangaId, chapId) {
         let metadata = {
             'mangaId': mangaId,
@@ -2885,7 +2885,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
             param: `${chapId}`
         });
     }
-    // Done @getBoolean
+    // TODO @getBoolean
     getChapterDetails(data, metadata) {
         let chapterDetails;
         if (metadata.mangaId.toLowerCase().includes('mangakakalot')) {
@@ -2896,7 +2896,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         }
         return chapterDetails;
     }
-    // Done @getBoolean
+    // TODO @getBoolean
     getMangakakalotChapterDetails(data, metadata) {
         var _a;
         let $ = this.cheerio.load(data);
