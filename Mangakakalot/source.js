@@ -2679,13 +2679,14 @@ const paperback_extensions_common_1 = require("paperback-extensions-common");
 const Manganelo_1 = require("../Manganelo");
 const MK_DOMAIN = 'https://mangakakalot.com';
 const MN_DOMAIN = 'https://manganelo.com';
-let MK_IMAGE_DOMAIN = 'https://avt.mkklcdnv6.com/';
+let MN_IMAGE_DOMAIN = 'https://avt.mkklcdnv6.com/';
+let MK_IMAGE_DOMAIN = 'https://s5.mkklcdnv5.com/';
 class Mangakakalot extends Manganelo_1.Manganelo {
     constructor(cheerio) {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.1.11'; }
+    get version() { return '0.1.14'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2889,15 +2890,32 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         console.log('url: ' + `${urlDomain}/chapter/`);
         console.log('param: ' + `${mangaCode}/${tempChapId}`);
         return createRequestObject({
-            url: `${urlDomain}/chapter/`,
+            //url: `${urlDomain}/chapter/`,
+            url: `${chapId}`,
             method: "GET",
             metadata: metadata,
             headers: {
                 'Referer': 'https://mangakakalot.com/',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36'
+                /*
                 'content-type': 'application/x-www-form-urlencoded',
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36'
-            },
-            param: `${mangaCode}/${tempChapId}`
+                //'authority': 's5.mkklcdnv5.com',
+                'method': 'GET',
+                //'path': '/mangakakalot/q2/qw924246/chapter_1/1.jpg',
+                'scheme': 'https',*/
+                //'accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+                /*'accept-encoding': 'gzip, deflate, br',
+                'accept-language': 'en-US,en;q=0.9',
+                'cache-control': 'no-cache',
+                'pragma': 'no-cache',
+                'referer': 'https://mangakakalot.com/',
+                'sec-fetch-dest': 'image',
+                'sec-fetch-mode': 'no-cors',
+                'sec-fetch-site': 'cross-site',
+                */
+            } //,
+            //param: `${mangaCode}/${tempChapId}`
         });
     }
     // TODO @getBoolean
@@ -2917,6 +2935,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     // TODO @getBoolean
     getMangakakalotChapterDetails(data, metadata) {
         var _a;
+        //  getChapterDetails(data: any, metadata: any): ChapterDetails {
         console.log('In getMangakakalotChapterDetails()');
         let $ = this.cheerio.load(data);
         let pages = [];
@@ -3072,13 +3091,12 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         tagSections[1].tags = types.map((e) => createTag({ id: e, label: e }));
         return tagSections;
     }
-    // TODO: @getBoolean
-    // Currently broken
+    // Done @getBoolean
     constructGetViewMoreRequest(key, page) {
         let metadata = { page: page };
         let param = '';
         if (key == 'latest_updates') {
-            param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`;
+            param = `/manga_list?type=latest&category=all&state=all&page=${metadata.page}`;
         }
         else {
             return undefined;
@@ -3146,7 +3164,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         let metadata = { page: 1 };
         let param = '';
         if (key == 'latest_updates') {
-            param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`;
+            param = `/manga_list?type=latest&category=all&state=all&page=${metadata.page}`;
         }
         else {
             return undefined;
@@ -3212,7 +3230,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
      */
     requestModifier(request) {
         let headers = request.headers == undefined ? {} : request.headers;
-        headers['Referer'] = `${MN_DOMAIN}`;
+        headers['Referer'] = `${MK_DOMAIN}`;
         return createRequestObject({
             url: request.url,
             method: request.method,
@@ -3227,8 +3245,8 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     }
     isLastPage($) {
         var _a;
-        let current = $('.page-select').text();
-        let total = $('.page-last').text();
+        let current = $('.page_select').text();
+        let total = $('.page_last').text();
         if (current) {
             total = ((_a = /(\d+)/g.exec(total)) !== null && _a !== void 0 ? _a : [''])[0];
             return (+total) === (+current);
