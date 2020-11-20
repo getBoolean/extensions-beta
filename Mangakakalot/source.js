@@ -2684,7 +2684,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.1.0'; }
+    get version() { return '0.1.2'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2846,23 +2846,26 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     }
     // Done @getBoolean
     getMangakakalotChapters(data, metadata) {
-        var _a, _b, _c, _d, _e;
+        var _a, _b, _c;
         let $ = this.cheerio.load(data);
         let allChapters = $('.chapter-list', '.leftCol');
         let chapters = [];
+        // volume is commented out because it doesn't sort properly.
         for (let chapter of $('.row', allChapters).toArray()) {
-            //let id: string = $('a', chapter).attr('href')?.split('/').pop() ?? ''
             let id = (_a = $('a', chapter).attr('href')) !== null && _a !== void 0 ? _a : '';
-            let name = (_b = $('a', chapter).text()) !== null && _b !== void 0 ? _b : '';
-            let chNum = Number((_d = ((_c = /Chapter (\d*)/g.exec(name)) !== null && _c !== void 0 ? _c : [])[1]) !== null && _d !== void 0 ? _d : '');
-            let time = new Date((_e = $('span:nth-child(3)', chapter).attr('title')) !== null && _e !== void 0 ? _e : '');
+            let text = (_b = $('a', chapter).text()) !== null && _b !== void 0 ? _b : '';
+            let chNum = Number(id.split('_').pop());
+            //let volume = Number ( text.includes('Vol.') ? text.slice( text.indexOf('Vol.') + 4, text.indexOf(' ')) : '')
+            let name = text; //text.includes(': ') ? text.slice(text.indexOf(': ') + 2, text.length) : ''
+            let time = Date.parse((_c = $('span:nth-child(3)', chapter).attr('title')) !== null && _c !== void 0 ? _c : '');
             chapters.push(createChapter({
                 id: id,
                 mangaId: metadata.id,
                 name: name,
                 langCode: paperback_extensions_common_1.LanguageCode.ENGLISH,
                 chapNum: chNum,
-                time: time
+                //volume: Number.isNaN(volume) ? 0 : volume,
+                time: isNaN(time) ? new Date() : new Date(time)
             }));
         }
         return chapters;
@@ -3334,21 +3337,25 @@ class Manganelo extends paperback_extensions_common_1.Source {
         });
     }
     getChapters(data, metadata) {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b, _c, _d, _e;
         let $ = this.cheerio.load(data);
         let allChapters = $('.row-content-chapter', '.body-site');
         let chapters = [];
+        // volume is commented out because it doesn't sort properly.
         for (let chapter of $('li', allChapters).toArray()) {
-            let id = (_b = (_a = $('a', chapter).attr('href')) === null || _a === void 0 ? void 0 : _a.split('/').pop()) !== null && _b !== void 0 ? _b : '';
-            let name = (_c = $('a', chapter).text()) !== null && _c !== void 0 ? _c : '';
-            let chNum = Number((_e = ((_d = /Chapter (\d*)/g.exec(name)) !== null && _d !== void 0 ? _d : [])[1]) !== null && _e !== void 0 ? _e : '');
-            let time = new Date((_f = $('.chapter-time', chapter).attr('title')) !== null && _f !== void 0 ? _f : '');
+            let id = (_a = $('a', chapter).attr('href')) !== null && _a !== void 0 ? _a : '';
+            let name = (_b = $('a', chapter).text()) !== null && _b !== void 0 ? _b : '';
+            let chNum = Number((_d = ((_c = /Chapter (\d*)/g.exec(name)) !== null && _c !== void 0 ? _c : [])[1]) !== null && _d !== void 0 ? _d : '');
+            //let volume = Number( name.includes('Vol.') ? name.slice( name.indexOf('Vol.') + 4, name.indexOf(' ')) : '')
+            //name = name.includes(': ') ? name.slice(name.indexOf(': ') + 2, name.length) : ''
+            let time = new Date((_e = $('.chapter-time', chapter).attr('title')) !== null && _e !== void 0 ? _e : '');
             chapters.push(createChapter({
                 id: id,
                 mangaId: metadata.id,
                 name: name,
                 langCode: paperback_extensions_common_1.LanguageCode.ENGLISH,
                 chapNum: chNum,
+                //volume: Number.isNaN(volume) ? 0 : volume,
                 time: time
             }));
         }
