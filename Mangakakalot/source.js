@@ -2686,7 +2686,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.1.15'; }
+    get version() { return '0.1.17'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -3214,7 +3214,6 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     requestModifier(request) {
         let headers = request.headers == undefined ? {} : request.headers;
         headers['Referer'] = `${MK_DOMAIN}`;
-        headers['user-agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36';
         return createRequestObject({
             url: request.url,
             method: request.method,
