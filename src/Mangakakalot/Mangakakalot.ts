@@ -12,7 +12,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.1.13'; }
+  get version(): string { return '0.1.14'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -237,16 +237,33 @@ export class Mangakakalot extends Manganelo {
     console.log('url: ' + `${urlDomain}/chapter/`)
     console.log('param: ' + `${mangaCode}/${tempChapId}`)
 
-    return createRequestObject({
-      url: `${urlDomain}/chapter/`,
+    return createRequestObject({ 
+      //url: `${urlDomain}/chapter/`,
+      url: `${chapId}`,
       method: "GET",
       metadata: metadata,
       headers: {
         'Referer': 'https://mangakakalot.com/',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36'
+        /*
         'content-type': 'application/x-www-form-urlencoded',
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36'
-      },
-      param: `${mangaCode}/${tempChapId}`
+        //'authority': 's5.mkklcdnv5.com',
+        'method': 'GET',
+        //'path': '/mangakakalot/q2/qw924246/chapter_1/1.jpg',
+        'scheme': 'https',*/
+        //'accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+        /*'accept-encoding': 'gzip, deflate, br',
+        'accept-language': 'en-US,en;q=0.9',
+        'cache-control': 'no-cache',
+        'pragma': 'no-cache',
+        'referer': 'https://mangakakalot.com/',
+        'sec-fetch-dest': 'image',
+        'sec-fetch-mode': 'no-cors',
+        'sec-fetch-site': 'cross-site',
+        */
+      }//,
+      //param: `${mangaCode}/${tempChapId}`
     })
   }
 
@@ -268,6 +285,7 @@ export class Mangakakalot extends Manganelo {
 
   // TODO @getBoolean
   getMangakakalotChapterDetails(data: any, metadata: any): ChapterDetails {
+//  getChapterDetails(data: any, metadata: any): ChapterDetails {
     console.log('In getMangakakalotChapterDetails()')
     let $ = this.cheerio.load(data)
     let pages: string[] = []
@@ -582,7 +600,7 @@ export class Mangakakalot extends Manganelo {
   requestModifier(request: Request): Request {
 
     let headers: any = request.headers == undefined ? {} : request.headers
-    headers['Referer'] = `${MN_DOMAIN}`
+    headers['Referer'] = `${MK_DOMAIN}`
 
     return createRequestObject({
       url: request.url,
