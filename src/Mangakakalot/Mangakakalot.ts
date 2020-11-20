@@ -11,7 +11,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.1.11'; }
+  get version(): string { return '0.1.13'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -427,13 +427,12 @@ export class Mangakakalot extends Manganelo {
     return tagSections
   }
 
-  // TODO: @getBoolean
-  // Currently broken
+  // Done @getBoolean
   constructGetViewMoreRequest(key: string, page: number) {
     let metadata = { page: page }
     let param = ''
     if (key == 'latest_updates') {
-      param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`
+      param = `/manga_list?type=latest&category=all&state=all&page=${metadata.page}`
     }
     else{
       return undefined
@@ -512,7 +511,7 @@ export class Mangakakalot extends Manganelo {
     let metadata = { page: 1 }
     let param = ''
     if (key == 'latest_updates') {
-      param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`
+      param = `/manga_list?type=latest&category=all&state=all&page=${metadata.page}`
     }
     else {
       return undefined
@@ -602,8 +601,8 @@ export class Mangakakalot extends Manganelo {
   
 
   isLastPage($: CheerioStatic): boolean {
-    let current = $('.page-select').text();
-    let total = $('.page-last').text();
+    let current = $('.page_select').text();
+    let total = $('.page_last').text();
 
     if (current) {
       total = (/(\d+)/g.exec(total) ?? [''])[0]
