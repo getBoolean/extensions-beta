@@ -231,6 +231,7 @@ export class Mangakakalot extends Manganelo {
     let metadata = {
       'mangaId': mangaId,
       'chapterId': tempChapId,
+      'chapterId': chapId, // chapId is the full URL
       'nextPage': false,
       'page': 1
     }
