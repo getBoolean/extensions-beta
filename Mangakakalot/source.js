@@ -2903,6 +2903,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     }
     // TODO @getBoolean
     getChapterDetails(data, metadata) {
+        console.log('Inside getChapterDetails()');
         let chapterDetails;
         console.log('metadata.mangaId: ' + metadata.mangaId);
         if (metadata.mangaId.toLowerCase().includes('mangakakalot')) {
