@@ -585,7 +585,6 @@ export class Mangakakalot extends Manganelo {
     let headers: any = request.headers == undefined ? {} : request.headers
     headers['Referer'] = `${MK_DOMAIN}`
     headers['user-agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36'
-    request.timeout = 10
 
     return createRequestObject({
       url: request.url,
