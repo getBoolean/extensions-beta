@@ -12,7 +12,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.1.15'; }
+  get version(): string { return '0.1.17'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -584,7 +584,6 @@ export class Mangakakalot extends Manganelo {
 
     let headers: any = request.headers == undefined ? {} : request.headers
     headers['Referer'] = `${MK_DOMAIN}`
-    headers['user-agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36'
 
     return createRequestObject({
       url: request.url,
