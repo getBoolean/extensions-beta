@@ -252,6 +252,7 @@ export class Mangakakalot extends Manganelo {
 
   // TODO @getBoolean
   getChapterDetails(data: any, metadata: any): ChapterDetails {
+    console.log('Inside getChapterDetails()')
     let chapterDetails : ChapterDetails
     console.log('metadata.mangaId: ' + metadata.mangaId)
     if (metadata.mangaId.toLowerCase().includes('mangakakalot')) {
