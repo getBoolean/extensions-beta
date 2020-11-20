@@ -2684,7 +2684,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.1.2'; }
+    get version() { return '0.1.8'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2872,26 +2872,37 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     }
     // TODO @getBoolean
     getChapterDetailsRequest(mangaId, chapId) {
+        var _a;
+        console.log('in getChapterDetailsRequest()');
+        let mangaIdTemp = mangaId.slice(mangaId.indexOf('/', mangaId.indexOf('/') + 2), mangaId.length);
+        let mangaCode = chapId.slice(chapId.indexOf('chapter/') + 8, chapId.indexOf('/chapter_'));
+        let urlDomain = mangaId.replace(mangaIdTemp, '');
+        let tempChapId = (_a = chapId.split('/').pop()) !== null && _a !== void 0 ? _a : chapId;
         let metadata = {
             'mangaId': mangaId,
-            'chapterId': chapId,
+            'chapterId': tempChapId,
             'nextPage': false,
             'page': 1
         };
+        console.log('url: ' + `${urlDomain}/chapter/`);
+        console.log('param: ' + `${mangaCode}/${tempChapId}`);
         return createRequestObject({
-            url: `${mangaId}/`,
+            url: `${urlDomain}/chapter/`,
             method: "GET",
             metadata: metadata,
-            param: `${chapId}`
+            param: `${mangaCode}/${tempChapId}`
         });
     }
     // TODO @getBoolean
     getChapterDetails(data, metadata) {
         let chapterDetails;
+        console.log('mangaId: ' + metadata.mangaId);
         if (metadata.mangaId.toLowerCase().includes('mangakakalot')) {
+            console.log('Entering this.getMangakakalotChapterDetails()');
             chapterDetails = this.getMangakakalotChapterDetails(data, metadata);
         }
         else { // metadata.mangaId.toLowerCase().includes('manganelo')
+            console.log('Entering super.getChapterDetails()');
             chapterDetails = super.getChapterDetails(data, metadata);
         }
         return chapterDetails;
@@ -2899,10 +2910,13 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     // TODO @getBoolean
     getMangakakalotChapterDetails(data, metadata) {
         var _a;
+        console.log('In getMangakakalotChapterDetails()');
         let $ = this.cheerio.load(data);
         let pages = [];
         for (let item of $('img', '.vung-doc').toArray()) {
-            pages.push((_a = $(item).attr('src')) !== null && _a !== void 0 ? _a : '');
+            let imageUrl = (_a = $(item).attr('src')) !== null && _a !== void 0 ? _a : '';
+            pages.push(imageUrl);
+            console.log('Pushing image url: ' + imageUrl);
         }
         let chapterDetails = createChapterDetails({
             id: metadata.chapterId,
