@@ -199,16 +199,18 @@ export class Mangakakalot extends Manganelo {
       let id: string = $('a', chapter).attr('href') ?? ''
       let text: string = $('a', chapter).text() ?? ''
       let chNum = Number( id.split('_').pop() )
+      let volume = Number ( text.includes('Vol.') ? text.slice( text.indexOf('Vol.') + 4, text.indexOf(' ')) : '')
       let name: string = text.includes(': ') ? text.slice(text.indexOf(': ') + 2, text.length) : ''
       
+      let time = Date.parse($('span:nth-child(3)', chapter).attr('title') ?? '')
       chapters.push(createChapter({
         id: id,
         mangaId: metadata.id,
         name: name,
         langCode: LanguageCode.ENGLISH,
         chapNum: chNum,
-        time: time
         volume: Number.isNaN(volume) ? 0 : volume,
+        time: isNaN(time) ? new Date() : new Date(time)
       }))
     }
     

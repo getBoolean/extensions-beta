@@ -151,16 +151,20 @@ export class Manganelo extends Source {
     let allChapters = $('.row-content-chapter', '.body-site')
     let chapters: Chapter[] = []
     for (let chapter of $('li', allChapters).toArray()) {
-      let id: string = $('a', chapter).attr('href')?.split('/').pop() ?? ''
+      let id: string = $('a', chapter).attr('href') ?? ''
       let name: string = $('a', chapter).text() ?? ''
       let chNum: number = Number((/Chapter (\d*)/g.exec(name) ?? [])[1] ?? '')
+      let volume = Number( name.includes('Vol.') ? name.slice( name.indexOf('Vol.') + 4, name.indexOf(' ')) : '')
+      name = name.includes(': ') ? name.slice(name.indexOf(': ') + 2, name.length) : ''
       let time: Date = new Date($('.chapter-time', chapter).attr('title') ?? '')
+
       chapters.push(createChapter({
         id: id,
         mangaId: metadata.id,
         name: name,
         langCode: LanguageCode.ENGLISH,
         chapNum: chNum,
+        volume: Number.isNaN(volume) ? 0 : volume,
         time: time
       }))
     }
