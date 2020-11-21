@@ -12,7 +12,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.1.20'; }
+  get version(): string { return '0.1.24'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -289,75 +289,63 @@ export class Mangakakalot extends Manganelo {
     //return chapterDetails
   }
 
-  // Removed  filterUpdatedMangaRequest(ids: any, time: Date): Request | null { return null }
+  // Removed: Mangakakalot does not show the updated date on their updates page @getBoolean
+  // filterUpdatedMangaRequest(ids: any, time: Date): Request | null { return null }
 
-  // Removed  filterUpdatedManga(data: any, metadata: any): MangaUpdates | null { return null }
+  // Removed: Mangakakalot does not show the updated date on their updates page @getBoolean
+  // filterUpdatedManga(data: any, metadata: any): MangaUpdates | null { return null }
 
-  // TODO: @getBoolean
-  // Mangakakalot does not support advanced search
+  // Done @getBoolean
+  // Mangakakalot does not support advanced search.
   searchRequest(query: SearchRequest): Request | null {
     let metadata = { page: 1, search: '' }
-    let genres = null //(query.includeGenre ?? []).concat(query.includeDemographic ?? []).join('_')
-    let excluded = null //(query.excludeGenre ?? []).concat(query.excludeDemographic ?? []).join('_')
-    let status = ""
-    switch (query.status) {
-      case 0: status = 'completed'; break
-      case 1: status = 'ongoing'; break
-      default: status = ''
-    }
 
     let keyword = (query.title ?? '').replace(/ /g, '_')
     if (query.author)
       keyword += (query.author ?? '').replace(/ /g, '_')
-    let search: string = `s=all&keyw=${keyword}`
-    search += `&g_i=${genres}&g_e=${excluded}`
-    if (status) {
-      search += `&sts=${status}`
-    }
-
+    let search: string = `${keyword}`
+    console.log('searchRequest(): ' + `${MK_DOMAIN}/search/story/` + `${search}?page=${metadata.page}`)
     metadata.search = search
     return createRequestObject({
-      url: `${MK_DOMAIN}/search?`,
+      url: `${MK_DOMAIN}/search/story/`,
       method: 'GET',
       metadata: metadata,
-      headers: {
-        "content-type": "application/x-www-form-urlencoded",
-      },
-      param: `${search}&page=${metadata.page}`
+      param: `${search}?page=${metadata.page}`
     })
   }
 
-  // TODO: @getBoolean
+  // Done @getBoolean
   search(data: any, metadata: any): PagedResults | null {
     let $ = this.cheerio.load(data)
-    let panel = $('.panel-content-genres')
+    let panel = $('.panel_story_list')
     let manga: MangaTile[] = []
-    for (let item of $('.content-genres-item', panel).toArray()) {
-      let id = $('.genres-item-name', item).attr('href')?.split('/').pop() ?? ''
-      let title = $('.genres-item-name', item).text()
-      let subTitle = $('.genres-item-chap', item).text()
-      let image = $('.img-loading', item).attr('src') ?? ''
-      let rating = $('.genres-item-rate', item).text()
-      let updated = $('.genres-item-time', item).text()
+    for (let item of $('.story_item', panel).toArray()) {
+      let url = $('a', item).first().attr('href') ?? ''
+      let title = $('.story_name', item).children().first().text()
+      let subTitle = $('.story_chapter', item).first().text().trim()
+      let image = $('img',item).attr('src') ?? ''
+      //let rating = $('.genres-item-rate', item).text()
+      let time = new Date($('.story_item_right span:nth-child(5)', item).text().replace(/((AM)*(PM)*)/g, '').replace('Updated : ', ''))
+      let updated = time.toDateString()
 
+      console.log('search(): ')
+      console.log('     url: ' + url)
+      console.log('   image: ' + image)
       manga.push(createMangaTile({
-        id: id,
+        id: url,
         image: image,
         title: createIconText({ text: title }),
         subtitleText: createIconText({ text: subTitle }),
-        primaryText: createIconText({ text: rating, icon: 'star.fill' }),
+        //primaryText: createIconText({ text: rating, icon: 'star.fill' }),
         secondaryText: createIconText({ text: updated, icon: 'clock.fill' })
       }))
     }
 
     metadata.page = metadata.page++;
     let nextPage = this.isLastPage($) ? undefined : {
-      url: `${MN_DOMAIN}/advanced_search?`,
+      url: `${MN_DOMAIN}/search/story/`,
       method: 'GET',
       metadata: metadata,
-      headers: {
-        "content-type": "application/x-www-form-urlencoded",
-      },
       param: `${metadata.search}&page=${metadata.page}`
     }
 
@@ -367,28 +355,11 @@ export class Mangakakalot extends Manganelo {
     });
   }
 
-  // TODO: @getBoolean
-  getTagsRequest(): Request | null {
-    return createRequestObject({
-      url: `${MK_DOMAIN}/search/`,
-      method: 'GET',
-      headers: {
-        "content-type": "application/x-www-form-urlencoded",
-      }
-    })
-  }
+  // Removed: Mangakakalot does not support searching plus tags @getBoolean
+  // getTagsRequest(): Request | null { return null }
 
-  // TODO: @getBoolean
-  getTags(data: any): TagSection[] | null {
-    let tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: [] }),
-    createTagSection({ id: '1', label: 'format', tags: [] })]
-    let genres = JSON.parse((data.match(/"Genre"\s*: (.*)/) ?? [])[1].replace(/'/g, "\""))
-    let typesHTML = (data.match(/"Type"\s*: (.*),/g) ?? [])[1]
-    let types = JSON.parse((typesHTML.match(/(\[.*\])/) ?? [])[1].replace(/'/g, "\""))
-    tagSections[0].tags = genres.map((e: any) => createTag({ id: e, label: e }))
-    tagSections[1].tags = types.map((e: any) => createTag({ id: e, label: e }))
-    return tagSections
-  }
+  // Removed: Mangakakalot does not support searching plus tags @getBoolean
+  // getTags(data: any): TagSection[] | null { return null }
 
   // Done @getBoolean
   constructGetViewMoreRequest(key: string, page: number) {
