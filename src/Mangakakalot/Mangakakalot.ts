@@ -12,7 +12,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.1.36'; }
+  get version(): string { return '0.1.38'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -404,7 +404,7 @@ export class Mangakakalot extends Manganelo {
           section.items = this.parseFeaturedMangaTiles($);
           break;
         case 'latest_updates':
-          section.items = this.parseLatestMangaSectionTiles($);
+          section.items = this.parseLatestMangaTiles($);
           break;
       }
 
@@ -432,7 +432,7 @@ export class Mangakakalot extends Manganelo {
     return popularManga;
   }
 
-  parseLatestMangaSectionTiles($: CheerioSelector): MangaTile[] {
+  parseLatestMangaTiles($: CheerioSelector): MangaTile[] {
     let latestManga: MangaTile[] = [];
 
     for (let item of $('.first', '.doreamon').toArray()) {
@@ -446,7 +446,12 @@ export class Mangakakalot extends Manganelo {
         subtitleText: createIconText({ text: $('.sts_1', item).first().text() }),
       }))
     }
-    /*let panel = $('.truyen-list')
+    return latestManga;
+  }
+
+  parseLatestMangaSectionTiles($: CheerioSelector): MangaTile[] {
+    let latestManga: MangaTile[] = [];
+    let panel = $('.truyen-list')
     for (let item of $('.list-truyen-item-wrap', panel).toArray()) {
       let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
       let image = $('img', item).first().attr('src') ?? ''
@@ -458,26 +463,27 @@ export class Mangakakalot extends Manganelo {
         title: createIconText({ text: title }),
         subtitleText: createIconText({ text: subtitle })
       }))
-    }*/
+    }
     return latestManga;
   }
 
     // Done @getBoolean
     constructGetViewMoreRequest(key: string, page: number) {
       console.log('Invoking constructGetViewMoreRequest() for page ' + page)
-      let metadata = { page: page }
+      console.log('key: ' + key)
       let param = ''
       if (key == 'latest_updates') {
-        param = `/manga_list?type=latest&category=all&state=all&page=${metadata.page}`
+        param = `manga_list?type=latest&category=all&state=all&page=${page}`
+        console.log('param: ' + param)
       }
-      else{
+      else {
         return undefined
       }
-  
+      console.log(`${MK_DOMAIN}/${param}`)
       return createRequestObject({
-        url: `${MK_DOMAIN}`,
+        url: `${MK_DOMAIN}/${param}`,
         method: 'GET',
-        param: param,
+        //param: param,
         metadata: {
           key, page
         }
@@ -505,50 +511,15 @@ export class Mangakakalot extends Manganelo {
   }*/
 
   // TODO: @getBoolean
-  getViewMoreItems(data: any, key: string, metadata: any): PagedResults | null {
+  getViewMoreItems(data: any, key: string, metadata: any): PagedResults {
     console.log('Invoking getViewMoreItems() for page ' + metadata.page)
+    console.log('key: ' + key)
     let $ = this.cheerio.load(data)
     let manga: MangaTile[] = []
 
     if (key == 'latest_updates') {
-      let panel = $('.truyen-list')
-      for (let item of $('.list-truyen-item-wrap', panel).toArray()) {
-        let id = $('a', item).first().attr('href') ?? ''
-        let image = $('img', item).first().attr('src') ?? ''
-        let title = $('a', item).first().attr('title') ?? ''
-        let subtitle = $('.list-story-item-wrap-chapter', item).attr('title') ?? ''
-        manga.push(createMangaTile({
-          id: id,
-          image: image,
-          title: createIconText({ text: title }),
-          subtitleText: createIconText({ text: subtitle })
-        }))
-      }
+      manga = this.parseLatestMangaSectionTiles($);
     }
-    else
-      return null;
-    /*
-    //let nextPage: Request | undefined = undefined
-    console.log(!this.isLastPage($));
-    if (!this.isLastPage($)) {
-      metadata.page = ++metadata.page;
-      let param = ''
-      if (key == 'latest_updates') {
-        param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`
-      }
-      else {
-        return null
-      }
-      nextPage = {
-        url: `${MK_DOMAIN}/`,
-        method: 'GET',
-        param: param,
-        metadata: metadata
-      }
-      console.log(nextPage.url);
-      console.log(nextPage.method);
-      console.log(nextPage.param);
-    }*/
 
     return createPagedResults({
       results: manga,
