@@ -2,9 +2,9 @@ import { /*Source,*/ Manga, MangaStatus, Chapter, ChapterDetails, HomeSectionReq
 import { Manganelo } from '../Manganelo'
 
 const MK_DOMAIN = 'https://mangakakalot.com'
-const MN_DOMAIN = 'https://manganelo.com'
-let MN_IMAGE_DOMAIN = 'https://avt.mkklcdnv6.com/'
-let MK_IMAGE_DOMAIN = 'https://s5.mkklcdnv5.com/'
+// const MN_DOMAIN = 'https://manganelo.com'
+// let MN_IMAGE_DOMAIN = 'https://avt.mkklcdnv6.com/'
+// let MK_IMAGE_DOMAIN = 'https://s5.mkklcdnv5.com/'
 
 export class Mangakakalot extends Manganelo {
   constructor(cheerio: CheerioAPI) {
@@ -12,7 +12,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.1.24'; }
+  get version(): string { return '0.1.29'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -209,7 +209,7 @@ export class Mangakakalot extends Manganelo {
       let timeString = $('span:nth-child(3)', chapter).attr('title') ?? ''
       let time: Date
       if (timeString.includes('a'))
-        time = super.convertTime(timeString)
+        time = super.convertTime(timeString.replace('mins', 'minutes'))
       else
         time = new Date(timeString)
 
@@ -298,7 +298,7 @@ export class Mangakakalot extends Manganelo {
   // Done @getBoolean
   // Mangakakalot does not support advanced search.
   searchRequest(query: SearchRequest): Request | null {
-    let metadata = { page: 1, search: '' }
+    let metadata = { 'page': 1, 'search': '' }
 
     let keyword = (query.title ?? '').replace(/ /g, '_')
     if (query.author)
@@ -343,7 +343,7 @@ export class Mangakakalot extends Manganelo {
 
     metadata.page = metadata.page++;
     let nextPage = this.isLastPage($) ? undefined : {
-      url: `${MN_DOMAIN}/search/story/`,
+      url: `${MK_DOMAIN}/search/story/`,
       method: 'GET',
       metadata: metadata,
       param: `${metadata.search}&page=${metadata.page}`
@@ -442,17 +442,17 @@ export class Mangakakalot extends Manganelo {
 
   // TODO: @getBoolean
   getViewMoreRequest(key: string): Request | undefined {
-    let metadata = { page: 1 }
+    let metadata = { 'page': 1 }
     let param = ''
     if (key == 'latest_updates') {
-      param = `/manga_list?type=latest&category=all&state=all&page=${metadata.page}`
+      param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`
     }
     else {
       return undefined
     }
 
     return createRequestObject({
-      url: `${MK_DOMAIN}`,
+      url: `${MK_DOMAIN}/`,
       method: 'GET',
       param: param,
       metadata: metadata
@@ -484,7 +484,11 @@ export class Mangakakalot extends Manganelo {
     let nextPage: Request | undefined = undefined
     console.log(!this.isLastPage($));
     if (!this.isLastPage($)) {
-      metadata.page = metadata.page++;
+      console.log('Current metadata.page: ' + metadata.page);
+      let page = metadata.page + 1;
+      console.log('Current page: ' + page);
+      metadata.page = page;
+      console.log('Next metadata.page: ' + metadata.page);
       let param = ''
       if (key == 'latest_updates') {
         param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`
@@ -493,7 +497,7 @@ export class Mangakakalot extends Manganelo {
         return null
       }
       nextPage = {
-        url: `${MK_DOMAIN}`,
+        url: `${MK_DOMAIN}/`,
         method: 'GET',
         param: param,
         metadata: metadata
