@@ -12,7 +12,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '1.0.0'; }
+  get version(): string { return '1.0.1'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -467,48 +467,29 @@ export class Mangakakalot extends Manganelo {
     return latestManga;
   }
 
-    // Done @getBoolean
-    constructGetViewMoreRequest(key: string, page: number) {
-      console.log('Invoking constructGetViewMoreRequest() for page ' + page)
-      console.log('key: ' + key)
-      let param = ''
-      if (key == 'latest_updates') {
-        param = `manga_list?type=latest&category=all&state=all&page=${page}`
-        console.log('param: ' + param)
-      }
-      else {
-        return undefined
-      }
-      console.log(`${MK_DOMAIN}/${param}`)
-      return createRequestObject({
-        url: `${MK_DOMAIN}/${param}`,
-        method: 'GET',
-        //param: param,
-        metadata: {
-          key, page
-        }
-      })
-    }
-
-
-  // TODO: @getBoolean
-  /*getViewMoreRequest(key: string): Request | undefined {
-    let metadata = { 'page': 1 }
+  // Done @getBoolean
+  constructGetViewMoreRequest(key: string, page: number) {
+    console.log('Invoking constructGetViewMoreRequest() for page ' + page)
+    console.log('key: ' + key)
     let param = ''
     if (key == 'latest_updates') {
-      param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`
+      param = `manga_list?type=latest&category=all&state=all&page=${page}`
+      console.log('param: ' + param)
     }
     else {
       return undefined
     }
-
+    console.log(`${MK_DOMAIN}/${param}`)
     return createRequestObject({
-      url: `${MK_DOMAIN}/`,
+      url: `${MK_DOMAIN}/${param}`,
       method: 'GET',
-      param: param,
-      metadata: metadata
+      //param: param,
+      metadata: {
+        key, page
+      }
     })
-  }*/
+  }
+
 
   // TODO: @getBoolean
   getViewMoreItems(data: any, key: string, metadata: any): PagedResults {
