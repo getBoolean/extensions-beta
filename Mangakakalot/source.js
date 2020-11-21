@@ -2686,7 +2686,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.0.11'; }
+    get version() { return '1.0.12'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -3158,6 +3158,9 @@ class Mangakakalot extends Manganelo_1.Manganelo {
             case 'new_manga':
                 param = `manga_list?type=newest&category=all&state=all&page=${page}`;
                 break;
+            case 'zcompleted_manga':
+                param = `manga_list?type=newest&category=all&state=Completed&page=${page}`;
+                break;
             default:
                 return undefined;
         }
@@ -3184,6 +3187,9 @@ class Mangakakalot extends Manganelo_1.Manganelo {
                 manga = this.parseMangaSectionTiles($);
                 break;
             case 'new_manga':
+                manga = this.parseMangaSectionTiles($);
+                break;
+            case 'zcompleted_manga':
                 manga = this.parseMangaSectionTiles($);
                 break;
             default:
