@@ -12,7 +12,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.1.19'; }
+  get version(): string { return '0.1.20'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -220,7 +220,7 @@ export class Mangakakalot extends Manganelo {
         langCode: LanguageCode.ENGLISH,
         chapNum: chNum,
         //volume: Number.isNaN(volume) ? 0 : volume,
-        time: isNaN(time) ? new Date() : new Date(time)
+        time: time
       }))
     }
     
