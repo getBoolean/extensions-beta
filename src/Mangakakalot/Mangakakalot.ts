@@ -12,7 +12,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '1.0.1'; }
+  get version(): string { return '1.0.5'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -369,10 +369,14 @@ export class Mangakakalot extends Manganelo {
       url: `${MK_DOMAIN}`,
       method: 'GET'
     })
-    /*let request2 = createRequestObject({
-      url: `${MK_DOMAIN}/manga_list?type=latest&category=all&state=all&page=`,
+    let request2 = createRequestObject({
+      url: `${MK_DOMAIN}/manga_list?type=topview&category=all&state=all&page=`,
       method: 'GET'
-    })*/
+    })
+    let request3 = createRequestObject({
+      url: `${MK_DOMAIN}/manga_list?type=newest&category=all&state=all&page=`,
+      method: 'GET'
+    })
     let section1 = createHomeSection({
       id: 'popular_manga',
       title: 'POPULAR MANGA'
@@ -382,15 +386,29 @@ export class Mangakakalot extends Manganelo {
       title: 'LATEST MANGA RELEASES',
       view_more: this.constructGetViewMoreRequest('latest_updates', 1)
     })
+    let section3 = createHomeSection({
+      id: 'hot_manga',
+      title: 'HOT MANGA',
+      view_more: this.constructGetViewMoreRequest('hot_manga', 1)
+    })
+    let section4 = createHomeSection({
+      id: 'new_manga',
+      title: 'NEW MANGA',
+      view_more: this.constructGetViewMoreRequest('new_manga', 1)
+    })
     return [
       createHomeSectionRequest({
         request: request1,
         sections: [section1, section2] 
-      })/*,
+      }),
       createHomeSectionRequest({
         request: request2,
-        sections: [section2]
-      })*/
+        sections: [section3]
+      }),
+      createHomeSectionRequest({
+        request: request3,
+        sections: [section4]
+      })
     ]
   }
 
@@ -405,6 +423,12 @@ export class Mangakakalot extends Manganelo {
           break;
         case 'latest_updates':
           section.items = this.parseLatestMangaTiles($);
+          break;
+        case 'hot_manga':
+          section.items = this.parseMangaSectionTiles($);
+          break;
+        case 'new_manga':
+          section.items = this.parseMangaSectionTiles($);
           break;
       }
 
@@ -449,11 +473,11 @@ export class Mangakakalot extends Manganelo {
     return latestManga;
   }
 
-  parseLatestMangaSectionTiles($: CheerioSelector): MangaTile[] {
+  parseMangaSectionTiles($: CheerioSelector): MangaTile[] {
     let latestManga: MangaTile[] = [];
     let panel = $('.truyen-list')
     for (let item of $('.list-truyen-item-wrap', panel).toArray()) {
-      let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
+      let id = $('a', item).first().attr('href') ?? ''
       let image = $('img', item).first().attr('src') ?? ''
       let title = $('a', item).first().attr('title') ?? ''
       let subtitle = $('.list-story-item-wrap-chapter', item).attr('title') ?? ''
@@ -472,18 +496,24 @@ export class Mangakakalot extends Manganelo {
     console.log('Invoking constructGetViewMoreRequest() for page ' + page)
     console.log('key: ' + key)
     let param = ''
-    if (key == 'latest_updates') {
-      param = `manga_list?type=latest&category=all&state=all&page=${page}`
-      console.log('param: ' + param)
-    }
-    else {
-      return undefined
+    switch (key) {
+      case 'latest_updates':
+        param = `manga_list?type=latest&category=all&state=all&page=${page}`
+        console.log('param: ' + param)
+        break;
+      case 'hot_manga':
+        param = `manga_list?type=topview&category=all&state=all&page=${page}`
+        break;
+      case 'new_manga':
+        param = `manga_list?type=newest&category=all&state=all&page=${page}`
+        break;
+      default:
+        return undefined
     }
     console.log(`${MK_DOMAIN}/${param}`)
     return createRequestObject({
       url: `${MK_DOMAIN}/${param}`,
       method: 'GET',
-      //param: param,
       metadata: {
         key, page
       }
@@ -498,8 +528,17 @@ export class Mangakakalot extends Manganelo {
     let $ = this.cheerio.load(data)
     let manga: MangaTile[] = []
 
-    if (key == 'latest_updates') {
-      manga = this.parseLatestMangaSectionTiles($);
+    switch (key) {
+      case 'latest_updates':
+        manga = this.parseMangaSectionTiles($);
+        break;
+      case 'hot_manga':
+        manga = this.parseMangaSectionTiles($);
+        break;
+      case 'new_manga':
+        manga = this.parseMangaSectionTiles($);
+        break;
+      default:
     }
 
     return createPagedResults({
