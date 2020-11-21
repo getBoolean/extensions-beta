@@ -12,7 +12,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '1.0.11'; }
+  get version(): string { return '1.0.12'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -531,6 +531,9 @@ export class Mangakakalot extends Manganelo {
       case 'new_manga':
         param = `manga_list?type=newest&category=all&state=all&page=${page}`
         break;
+      case 'zcompleted_manga':
+        param = `manga_list?type=newest&category=all&state=Completed&page=${page}`
+        break;
       default:
         return undefined
     }
@@ -560,6 +563,9 @@ export class Mangakakalot extends Manganelo {
         manga = this.parseMangaSectionTiles($);
         break;
       case 'new_manga':
+        manga = this.parseMangaSectionTiles($);
+        break;
+      case 'zcompleted_manga':
         manga = this.parseMangaSectionTiles($);
         break;
       default:
