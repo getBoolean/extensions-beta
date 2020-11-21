@@ -120,7 +120,6 @@ export class Mangakakalot extends Manganelo {
       }
       genres.push(text)
       //ids.push(id)
-      
     }
     //tagSections[0].tags.push(createTag({ id: id, label: text }))
     tagSections[0].tags = genres.map((elem: string) => createTag({ id: elem, label: elem }))
