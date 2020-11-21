@@ -2686,7 +2686,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.0.1'; }
+    get version() { return '1.0.11'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2749,12 +2749,14 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     // Done @getBoolean
     parseMangakakalotMangaDetails(data, metadata) {
         var _a, _b, _c, _d, _e, _f;
-        //console.log('Inside parseMangakakalotMangaDetails()')
+        console.log('Inside parseMangakakalotMangaDetails()');
         let manga = [];
         let $ = this.cheerio.load(data);
         let panel = $('.manga-info-top');
         let title = (_a = $('h1', panel).first().text()) !== null && _a !== void 0 ? _a : '';
         let image = (_b = $('.manga-info-pic', panel).children().first().attr('src')) !== null && _b !== void 0 ? _b : '';
+        if (image == '//mangakakalot.com/themes/home/images/404-avatar.png' || image == '')
+            image = 'https://mangakakalot.com/themes/home/images/404-avatar.png';
         let table = $('.manga-info-text', panel);
         let author = ''; // Updated below
         let artist = ''; // Updated below
@@ -2903,7 +2905,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     getChapterDetails(data, metadata) {
         console.log('Inside getChapterDetails()');
         //let chapterDetails : ChapterDetails
-        console.log('metadata.mangaId: ' + metadata.mangaId);
+        //console.log('metadata.mangaId: ' + metadata.mangaId)
         if (metadata.mangaId.toLowerCase().includes('mangakakalot')) {
             console.log('Invoking method this.getMangakakalotChapterDetails()');
             return this.getMangakakalotChapterDetails(data, metadata);
@@ -2916,23 +2918,20 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     // Done @getBoolean
     getMangakakalotChapterDetails(data, metadata) {
         var _a;
-        //  getChapterDetails(data: any, metadata: any): ChapterDetails {
         console.log('In getMangakakalotChapterDetails()');
         let $ = this.cheerio.load(data);
         let pages = [];
         for (let item of $('img', '.vung-doc').toArray()) {
             let imageUrl = (_a = $(item).attr('src')) !== null && _a !== void 0 ? _a : '';
             pages.push(imageUrl);
-            console.log('Pushing image url: ' + imageUrl);
+            //console.log('Pushing image url: ' + imageUrl)
         }
-        //let chapterDetails = createChapterDetails({
         return createChapterDetails({
             id: metadata.chapterId,
             mangaId: metadata.mangaId,
             pages: pages,
             longStrip: false
         });
-        //return chapterDetails
     }
     // Removed: Mangakakalot does not show the updated date on their updates page @getBoolean
     // filterUpdatedMangaRequest(ids: any, time: Date): Request | null { return null }
@@ -2947,7 +2946,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         if (query.author)
             keyword += ((_b = query.author) !== null && _b !== void 0 ? _b : '').replace(/ /g, '_');
         let search = `${keyword}`;
-        console.log('searchRequest(): ' + `${MK_DOMAIN}/search/story/` + `${search}?page=${metadata.page}`);
+        //console.log('searchRequest(): ' + `${MK_DOMAIN}/search/story/` + `${search}?page=${metadata.page}`)
         metadata.search = search;
         return createRequestObject({
             url: `${MK_DOMAIN}/search/story/`,
@@ -2967,12 +2966,14 @@ class Mangakakalot extends Manganelo_1.Manganelo {
             let title = $('.story_name', item).children().first().text();
             let subTitle = $('.story_chapter', item).first().text().trim();
             let image = (_b = $('img', item).attr('src')) !== null && _b !== void 0 ? _b : '';
+            if (image == '//mangakakalot.com/themes/home/images/404-avatar.png' || image == '')
+                image = 'https://mangakakalot.com/themes/home/images/404-avatar.png';
             //let rating = $('.genres-item-rate', item).text()
             let time = new Date($('.story_item_right span:nth-child(5)', item).text().replace(/((AM)*(PM)*)/g, '').replace('Updated : ', ''));
             let updated = time.toDateString();
-            console.log('search(): ');
-            console.log('     url: ' + url);
-            console.log('   image: ' + image);
+            //console.log('search(): ')
+            //console.log('     url: ' + url)
+            //console.log('   image: ' + image)
             manga.push(createMangaTile({
                 id: url,
                 image: image,
@@ -3004,10 +3005,18 @@ class Mangakakalot extends Manganelo_1.Manganelo {
             url: `${MK_DOMAIN}`,
             method: 'GET'
         });
-        /*let request2 = createRequestObject({
-          url: `${MK_DOMAIN}/manga_list?type=latest&category=all&state=all&page=`,
-          method: 'GET'
-        })*/
+        let request2 = createRequestObject({
+            url: `${MK_DOMAIN}/manga_list?type=topview&category=all&state=all&page=`,
+            method: 'GET'
+        });
+        let request3 = createRequestObject({
+            url: `${MK_DOMAIN}/manga_list?type=newest&category=all&state=all&page=`,
+            method: 'GET'
+        });
+        let request4 = createRequestObject({
+            url: `${MK_DOMAIN}/manga_list?type=newest&category=all&state=Completed&page=`,
+            method: 'GET'
+        });
         let section1 = createHomeSection({
             id: 'popular_manga',
             title: 'POPULAR MANGA'
@@ -3017,15 +3026,38 @@ class Mangakakalot extends Manganelo_1.Manganelo {
             title: 'LATEST MANGA RELEASES',
             view_more: this.constructGetViewMoreRequest('latest_updates', 1)
         });
+        let section3 = createHomeSection({
+            id: 'hot_manga',
+            title: 'HOT MANGA',
+            view_more: this.constructGetViewMoreRequest('hot_manga', 1)
+        });
+        let section4 = createHomeSection({
+            id: 'new_manga',
+            title: 'NEW MANGA',
+            view_more: this.constructGetViewMoreRequest('new_manga', 1)
+        });
+        let section5 = createHomeSection({
+            id: 'zcompleted_manga',
+            title: 'COMPLETED MANGA',
+            view_more: this.constructGetViewMoreRequest('zcompleted_manga', 1)
+        });
         return [
             createHomeSectionRequest({
                 request: request1,
                 sections: [section1, section2]
-            }) /*,
+            }),
             createHomeSectionRequest({
-              request: request2,
-              sections: [section2]
-            })*/
+                request: request2,
+                sections: [section3]
+            }),
+            createHomeSectionRequest({
+                request: request3,
+                sections: [section4]
+            }),
+            createHomeSectionRequest({
+                request: request4,
+                sections: [section5]
+            })
         ];
     }
     // Done
@@ -3039,6 +3071,15 @@ class Mangakakalot extends Manganelo_1.Manganelo {
                 case 'latest_updates':
                     section.items = this.parseLatestMangaTiles($);
                     break;
+                case 'hot_manga':
+                    section.items = this.parseMangaSectionTiles($);
+                    break;
+                case 'new_manga':
+                    section.items = this.parseMangaSectionTiles($);
+                    break;
+                case 'zcompleted_manga':
+                    section.items = this.parseMangaSectionTiles($);
+                    break;
             }
             return section;
         });
@@ -3049,6 +3090,8 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         for (let item of $('.item', '.owl-carousel').toArray()) {
             let url = (_a = $('a', item).first().attr('href')) !== null && _a !== void 0 ? _a : '';
             let image = (_b = $('img', item).attr('src')) !== null && _b !== void 0 ? _b : '';
+            if (image == '//mangakakalot.com/themes/home/images/404-avatar.png' || image == '')
+                image = 'https://mangakakalot.com/themes/home/images/404-avatar.png';
             let title = $('div.slide-caption', item).children().first().text();
             let subtitle = $('div.slide-caption', item).children().last().text();
             popularManga.push(createMangaTile({
@@ -3066,6 +3109,9 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         for (let item of $('.first', '.doreamon').toArray()) {
             let url = (_a = $('a', item).first().attr('href')) !== null && _a !== void 0 ? _a : '';
             let image = (_b = $('img', item).attr('src')) !== null && _b !== void 0 ? _b : '';
+            if (image == '//mangakakalot.com/themes/home/images/404-avatar.png' || image == '')
+                image = 'https://mangakakalot.com/themes/home/images/404-avatar.png';
+            //console.log(image)
             latestManga.push(createMangaTile({
                 id: url,
                 image: image,
@@ -3075,15 +3121,18 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         }
         return latestManga;
     }
-    parseLatestMangaSectionTiles($) {
-        var _a, _b, _c, _d, _e;
+    parseMangaSectionTiles($) {
+        var _a, _b, _c, _d;
         let latestManga = [];
         let panel = $('.truyen-list');
         for (let item of $('.list-truyen-item-wrap', panel).toArray()) {
-            let id = (_b = (_a = $('a', item).first().attr('href')) === null || _a === void 0 ? void 0 : _a.split('/').pop()) !== null && _b !== void 0 ? _b : '';
-            let image = (_c = $('img', item).first().attr('src')) !== null && _c !== void 0 ? _c : '';
-            let title = (_d = $('a', item).first().attr('title')) !== null && _d !== void 0 ? _d : '';
-            let subtitle = (_e = $('.list-story-item-wrap-chapter', item).attr('title')) !== null && _e !== void 0 ? _e : '';
+            let id = (_a = $('a', item).first().attr('href')) !== null && _a !== void 0 ? _a : '';
+            let image = (_b = $('img', item).first().attr('src')) !== null && _b !== void 0 ? _b : '';
+            if (image == '//mangakakalot.com/themes/home/images/404-avatar.png' || image == '')
+                image = 'https://mangakakalot.com/themes/home/images/404-avatar.png';
+            //console.log(image)
+            let title = (_c = $('a', item).first().attr('title')) !== null && _c !== void 0 ? _c : '';
+            let subtitle = (_d = $('.list-story-item-wrap-chapter', item).attr('title')) !== null && _d !== void 0 ? _d : '';
             latestManga.push(createMangaTile({
                 id: id,
                 image: image,
@@ -3098,18 +3147,24 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         console.log('Invoking constructGetViewMoreRequest() for page ' + page);
         console.log('key: ' + key);
         let param = '';
-        if (key == 'latest_updates') {
-            param = `manga_list?type=latest&category=all&state=all&page=${page}`;
-            console.log('param: ' + param);
-        }
-        else {
-            return undefined;
+        switch (key) {
+            case 'latest_updates':
+                param = `manga_list?type=latest&category=all&state=all&page=${page}`;
+                //console.log('param: ' + param)
+                break;
+            case 'hot_manga':
+                param = `manga_list?type=topview&category=all&state=all&page=${page}`;
+                break;
+            case 'new_manga':
+                param = `manga_list?type=newest&category=all&state=all&page=${page}`;
+                break;
+            default:
+                return undefined;
         }
         console.log(`${MK_DOMAIN}/${param}`);
         return createRequestObject({
             url: `${MK_DOMAIN}/${param}`,
             method: 'GET',
-            //param: param,
             metadata: {
                 key, page
             }
@@ -3121,8 +3176,17 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         console.log('key: ' + key);
         let $ = this.cheerio.load(data);
         let manga = [];
-        if (key == 'latest_updates') {
-            manga = this.parseLatestMangaSectionTiles($);
+        switch (key) {
+            case 'latest_updates':
+                manga = this.parseMangaSectionTiles($);
+                break;
+            case 'hot_manga':
+                manga = this.parseMangaSectionTiles($);
+                break;
+            case 'new_manga':
+                manga = this.parseMangaSectionTiles($);
+                break;
+            default:
         }
         return createPagedResults({
             results: manga,
