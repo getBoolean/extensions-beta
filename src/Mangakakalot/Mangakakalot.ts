@@ -294,92 +294,77 @@ export class Mangakakalot extends Manganelo {
   // Removed  filterUpdatedManga(data: any, metadata: any): MangaUpdates | null { return null }
 
   // TODO: @getBoolean
+  // Mangakakalot does not support advanced search
   searchRequest(query: SearchRequest): Request | null {
+    let metadata = { page: 1, search: '' }
+    let genres = null //(query.includeGenre ?? []).concat(query.includeDemographic ?? []).join('_')
+    let excluded = null //(query.excludeGenre ?? []).concat(query.excludeDemographic ?? []).join('_')
     let status = ""
     switch (query.status) {
-      case 0: status = 'Completed'; break
-      case 1: status = 'Ongoing'; break
+      case 0: status = 'completed'; break
+      case 1: status = 'ongoing'; break
       default: status = ''
     }
 
-    let genre: string[] | undefined = query.includeGenre ?
-      (query.includeDemographic ? query.includeGenre.concat(query.includeDemographic) : query.includeGenre) :
-      query.includeDemographic
-    let genreNo: string[] | undefined = query.excludeGenre ?
-      (query.excludeDemographic ? query.excludeGenre.concat(query.excludeDemographic) : query.excludeGenre) :
-      query.excludeDemographic
-
-    let metadata: any = {
-      'keyword': query.title,
-      'author': query.author || query.artist || '',
-      'status': status,
-      'type': query.includeFormat,
-      'genre': genre,
-      'genreNo': genreNo
+    let keyword = (query.title ?? '').replace(/ /g, '_')
+    if (query.author)
+      keyword += (query.author ?? '').replace(/ /g, '_')
+    let search: string = `s=all&keyw=${keyword}`
+    search += `&g_i=${genres}&g_e=${excluded}`
+    if (status) {
+      search += `&sts=${status}`
     }
-    
+
+    metadata.search = search
     return createRequestObject({
-      url: `${MK_DOMAIN}/search/story/`,
+      url: `${MK_DOMAIN}/search?`,
+      method: 'GET',
       metadata: metadata,
       headers: {
-        "content-type": "application/x-www-form-urlencoded"
+        "content-type": "application/x-www-form-urlencoded",
       },
-      method: "GET"
+      param: `${search}&page=${metadata.page}`
     })
   }
 
   // TODO: @getBoolean
   search(data: any, metadata: any): PagedResults | null {
     let $ = this.cheerio.load(data)
-    let mangaTiles: MangaTile[] = []
-    let directory = JSON.parse((data.match(/vm.Directory = (.*);/) ?? [])[1])
+    let panel = $('.panel-content-genres')
+    let manga: MangaTile[] = []
+    for (let item of $('.content-genres-item', panel).toArray()) {
+      let id = $('.genres-item-name', item).attr('href')?.split('/').pop() ?? ''
+      let title = $('.genres-item-name', item).text()
+      let subTitle = $('.genres-item-chap', item).text()
+      let image = $('.img-loading', item).attr('src') ?? ''
+      let rating = $('.genres-item-rate', item).text()
+      let updated = $('.genres-item-time', item).text()
 
-    let imgSource = ($('.img-fluid').first().attr('src')?.match(/(.*cover)/) ?? [])[1];
-    if (imgSource !== MK_IMAGE_DOMAIN)
-      MK_IMAGE_DOMAIN = imgSource;
+      manga.push(createMangaTile({
+        id: id,
+        image: image,
+        title: createIconText({ text: title }),
+        subtitleText: createIconText({ text: subTitle }),
+        primaryText: createIconText({ text: rating, icon: 'star.fill' }),
+        secondaryText: createIconText({ text: updated, icon: 'clock.fill' })
+      }))
+    }
 
-    directory.forEach((elem: any) => {
-      let mKeyword: boolean = typeof metadata.keyword !== 'undefined' ? false : true
-      let mAuthor: boolean = metadata.author !== '' ? false : true
-      let mStatus: boolean = metadata.status !== '' ? false : true
-      let mType: boolean = typeof metadata.type !== 'undefined' && metadata.type.length > 0 ? false : true
-      let mGenre: boolean = typeof metadata.genre !== 'undefined' && metadata.genre.length > 0 ? false : true
-      let mGenreNo: boolean = typeof metadata.genreNo !== 'undefined' ? true : false
+    metadata.page = metadata.page++;
+    let nextPage = this.isLastPage($) ? undefined : {
+      url: `${MN_DOMAIN}/advanced_search?`,
+      method: 'GET',
+      metadata: metadata,
+      headers: {
+        "content-type": "application/x-www-form-urlencoded",
+      },
+      param: `${metadata.search}&page=${metadata.page}`
+    }
 
-      if (!mKeyword) {
-        let allWords: string[] = [elem.s.toLowerCase()].concat(elem.al.map((e: string) => e.toLowerCase()))
-        allWords.forEach((key: string) => {
-          if (key.includes(metadata.keyword.toLowerCase())) mKeyword = true
-        })
-      }
-
-      if (!mAuthor) {
-        let authors: string[] = elem.a.map((e: string) => e.toLowerCase())
-        if (authors.includes(metadata.author.toLowerCase())) mAuthor = true
-      }
-
-      if (!mStatus) {
-        if ((elem.ss == 'Ongoing' && metadata.status == 'Ongoing') || (elem.ss != 'Ongoing' && metadata.ss != 'Ongoing')) mStatus = true
-      }
-
-      if (!mType) mType = metadata.type.includes(elem.t)
-      if (!mGenre) mGenre = metadata.genre.every((i: string) => elem.g.includes(i))
-      if (mGenreNo) mGenreNo = metadata.genreNo.every((i: string) => elem.g.includes(i))
-
-      if (mKeyword && mAuthor && mStatus && mType && mGenre && !mGenreNo) {
-        mangaTiles.push(createMangaTile({
-          id: elem.i,
-          title: createIconText({ text: elem.s }),
-          image: `${MK_IMAGE_DOMAIN}/${elem.i}.jpg`,
-          subtitleText: createIconText({ text: elem.ss })
-        }))
-      }
-    })
-
-    // Because this parses JSON, there is never any additional search requests to create
     return createPagedResults({
-      results: mangaTiles
-    })
+      results: manga,
+      nextPage: nextPage
+    });
   }
 
   // TODO: @getBoolean
