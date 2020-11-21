@@ -12,13 +12,13 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.1.38'; }
+  get version(): string { return '1.0.1'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
   get authorWebsite(): string { return 'https://github.com/getBoolean' }
   get language(): string { return 'English' }
-  get description(): string { return 'Extension that pulls manga from Mangakakalot' }
+  get description(): string { return 'Extension that pulls manga from Mangakakalot. Does not support Advanced Search' }
   get hentaiSource(): boolean { return false }
   getMangaShareUrl(mangaId: string): string | null { 
     /*if ( mangaId.includes('read-')) {
@@ -33,14 +33,14 @@ export class Mangakakalot extends Manganelo {
     return 2
   }
 
-  get sourceTags(): SourceTag[] {
+  /*get sourceTags(): SourceTag[] {
     return [
       {
         text: "WIP",
         type: TagType.RED
       }
     ]
-  }
+  }*/
 
   // Done @getBoolean
   getMangaDetailsRequest(ids: string[]): Request[] {
@@ -467,48 +467,29 @@ export class Mangakakalot extends Manganelo {
     return latestManga;
   }
 
-    // Done @getBoolean
-    constructGetViewMoreRequest(key: string, page: number) {
-      console.log('Invoking constructGetViewMoreRequest() for page ' + page)
-      console.log('key: ' + key)
-      let param = ''
-      if (key == 'latest_updates') {
-        param = `manga_list?type=latest&category=all&state=all&page=${page}`
-        console.log('param: ' + param)
-      }
-      else {
-        return undefined
-      }
-      console.log(`${MK_DOMAIN}/${param}`)
-      return createRequestObject({
-        url: `${MK_DOMAIN}/${param}`,
-        method: 'GET',
-        //param: param,
-        metadata: {
-          key, page
-        }
-      })
-    }
-
-
-  // TODO: @getBoolean
-  /*getViewMoreRequest(key: string): Request | undefined {
-    let metadata = { 'page': 1 }
+  // Done @getBoolean
+  constructGetViewMoreRequest(key: string, page: number) {
+    console.log('Invoking constructGetViewMoreRequest() for page ' + page)
+    console.log('key: ' + key)
     let param = ''
     if (key == 'latest_updates') {
-      param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`
+      param = `manga_list?type=latest&category=all&state=all&page=${page}`
+      console.log('param: ' + param)
     }
     else {
       return undefined
     }
-
+    console.log(`${MK_DOMAIN}/${param}`)
     return createRequestObject({
-      url: `${MK_DOMAIN}/`,
+      url: `${MK_DOMAIN}/${param}`,
       method: 'GET',
-      param: param,
-      metadata: metadata
+      //param: param,
+      metadata: {
+        key, page
+      }
     })
-  }*/
+  }
+
 
   // TODO: @getBoolean
   getViewMoreItems(data: any, key: string, metadata: any): PagedResults {
