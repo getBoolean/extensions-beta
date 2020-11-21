@@ -12,7 +12,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '1.0.12'; }
+  get version(): string { return '1.1.0'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -105,18 +105,24 @@ export class Mangakakalot extends Manganelo {
     let lastUpdate = '' // Updated below
     let hentai = false
 
-    let tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: [] })]
+    let tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: [] }), createTagSection({ id: '1', label: 'format', tags: [] })]
 
     // Genres
     let elems = $('.manga-info-text li:nth-child(7)').find('a').toArray()
+    let genres: string[] = []
+    //let ids: string[] = []
     for (let elem of elems) {
+
       let text = $(elem).text()
-      let id = $(elem).attr('href')?.split('/').pop()?.split('&')[1].replace('category=', '') ?? ''
-      if (text.toLowerCase().includes('smut')) {
+      //let id = $(elem).attr('href')?.split('/').pop()?.split('&')[1].replace('category=', '') ?? ''
+      if (text.toLowerCase().includes('smut') || text.toLowerCase().includes('adult')) {
         hentai = true
       }
-      tagSections[0].tags.push(createTag({ id: id, label: text }))
+      genres.push(text)
+      //ids.push(id)
     }
+    //tagSections[0].tags.push(createTag({ id: id, label: text }))
+    tagSections[0].tags = genres.map((elem: string) => createTag({ id: elem, label: elem }))
 
     // Date
     let time = new Date($('.manga-info-text li:nth-child(4)').text().replace(/((AM)*(PM)*)/g, '').replace('Last updated : ', ''))
