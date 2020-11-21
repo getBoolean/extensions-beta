@@ -62,7 +62,7 @@ export class Manganelo extends Source {
     let lastUpdate = ''
     let hentai = false
 
-    let tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: [] })]
+    let tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: [] }), createTagSection({ id: '1', label: 'format', tags: [] })]
 
     for (let row of $('tr', table).toArray()) {
       if ($(row).find('.info-alternative').length > 0) {
@@ -83,14 +83,17 @@ export class Manganelo extends Source {
       }
       else if ($(row).find('.info-genres').length > 0) {
         let elems = $('.table-value', row).find('a').toArray()
+        let genres: string[] = []
         for (let elem of elems) {
           let text = $(elem).text()
-          let id = $(elem).attr('href')?.split('/').pop()?.split('-').pop() ?? ''
+          //let id = $(elem).attr('href')?.split('/').pop()?.split('-').pop() ?? ''
           if (text.toLowerCase().includes('smut')) {
             hentai = true
           }
-          tagSections[0].tags.push(createTag({ id: id, label: text }))
+          genres.push(text)
+          //tagSections[0].tags.push(createTag({ id: text, label: text }))
         }
+        tagSections[0].tags = genres.map((elem: string) => createTag({ id: elem, label: elem }))
       }
     }
 
