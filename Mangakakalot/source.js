@@ -2686,7 +2686,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.0.0'; }
+    get version() { return '1.0.1'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -3115,24 +3115,6 @@ class Mangakakalot extends Manganelo_1.Manganelo {
             }
         });
     }
-    // TODO: @getBoolean
-    /*getViewMoreRequest(key: string): Request | undefined {
-      let metadata = { 'page': 1 }
-      let param = ''
-      if (key == 'latest_updates') {
-        param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`
-      }
-      else {
-        return undefined
-      }
-  
-      return createRequestObject({
-        url: `${MK_DOMAIN}/`,
-        method: 'GET',
-        param: param,
-        metadata: metadata
-      })
-    }*/
     // TODO: @getBoolean
     getViewMoreItems(data, key, metadata) {
         console.log('Invoking getViewMoreItems() for page ' + metadata.page);
