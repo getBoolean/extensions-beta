@@ -2686,7 +2686,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.1.19'; }
+    get version() { return '0.1.20'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2859,7 +2859,12 @@ class Mangakakalot extends Manganelo_1.Manganelo {
             let chNum = Number(id.split('_').pop());
             //let volume = Number ( text.includes('Vol.') ? text.slice( text.indexOf('Vol.') + 4, text.indexOf(' ')) : '')
             let name = text; //text.includes(': ') ? text.slice(text.indexOf(': ') + 2, text.length) : ''
-            let time = Date.parse((_c = $('span:nth-child(3)', chapter).attr('title')) !== null && _c !== void 0 ? _c : '');
+            let timeString = (_c = $('span:nth-child(3)', chapter).attr('title')) !== null && _c !== void 0 ? _c : '';
+            let time;
+            if (timeString.includes('a'))
+                time = super.convertTime(timeString);
+            else
+                time = new Date(timeString);
             chapters.push(createChapter({
                 id: id,
                 mangaId: metadata.id,
@@ -2867,13 +2872,12 @@ class Mangakakalot extends Manganelo_1.Manganelo {
                 langCode: paperback_extensions_common_1.LanguageCode.ENGLISH,
                 chapNum: chNum,
                 //volume: Number.isNaN(volume) ? 0 : volume,
-                time: isNaN(time) ? new Date() : new Date(time)
+                time: time
             }));
         }
         return chapters;
     }
-    // Need to add headers
-    // TODO @getBoolean
+    // Done @getBoolean
     getChapterDetailsRequest(mangaId, chapId) {
         console.log('in getChapterDetailsRequest()');
         //let mangaIdTemp = mangaId.slice( mangaId.indexOf( '/', mangaId.indexOf('/') + 2 ), mangaId.length )
@@ -2882,6 +2886,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         //let tempChapId = chapId.split('/').pop() ?? chapId
         let metadata = {
             'mangaId': mangaId,
+            // Thanks to @FaizanDurrani for this fix. tempChapId was used instead of chapId
             'chapterId': chapId,
             'nextPage': false,
             'page': 1
@@ -2894,7 +2899,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
             metadata: metadata
         });
     }
-    // TODO @getBoolean
+    // Done @getBoolean
     getChapterDetails(data, metadata) {
         console.log('Inside getChapterDetails()');
         //let chapterDetails : ChapterDetails
@@ -2908,7 +2913,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
             return super.getChapterDetails(data, metadata);
         }
     }
-    // TODO @getBoolean
+    // Done @getBoolean
     getMangakakalotChapterDetails(data, metadata) {
         var _a;
         //  getChapterDetails(data: any, metadata: any): ChapterDetails {
@@ -2929,121 +2934,79 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         });
         //return chapterDetails
     }
-    /*
-      // TODO: @getBoolean
-      filterUpdatedMangaRequest(ids: any, time: Date): Request {
-        let metadata = { 'ids': ids, 'referenceTime': time }
-        return createRequestObject({
-          url: `${MK_DOMAIN}/`,
-          metadata: metadata,
-          headers: {
-            "content-type": "application/x-www-form-urlencoded"
-          },
-          method: "GET"
-        })
-      }
-    
-      // TODO: @getBoolean
-      filterUpdatedManga(data: any, metadata: any): MangaUpdates {
-        let $ = this.cheerio.load(data)
-    
-        // Because this source parses JSON, there is never any additional pages to parse
-        let returnObject: MangaUpdates = {
-          'ids': []
-        }
-        let updateManga = JSON.parse((data.match(/vm.LatestJSON = (.*);/) ?? [])[1])
-        updateManga.forEach((elem: any) => {
-          if (metadata.ids.includes(elem.IndexName) && metadata.referenceTime < new Date(elem.Date)) returnObject.ids.push(elem.IndexName)
-        })
-    
-        return createMangaUpdates(returnObject)
-      }
-    */
+    // Removed  filterUpdatedMangaRequest(ids: any, time: Date): Request | null { return null }
+    // Removed  filterUpdatedManga(data: any, metadata: any): MangaUpdates | null { return null }
     // TODO: @getBoolean
+    // Mangakakalot does not support advanced search
     searchRequest(query) {
+        var _a, _b;
+        let metadata = { page: 1, search: '' };
+        let genres = null; //(query.includeGenre ?? []).concat(query.includeDemographic ?? []).join('_')
+        let excluded = null; //(query.excludeGenre ?? []).concat(query.excludeDemographic ?? []).join('_')
         let status = "";
         switch (query.status) {
             case 0:
-                status = 'Completed';
+                status = 'completed';
                 break;
             case 1:
-                status = 'Ongoing';
+                status = 'ongoing';
                 break;
             default: status = '';
         }
-        let genre = query.includeGenre ?
-            (query.includeDemographic ? query.includeGenre.concat(query.includeDemographic) : query.includeGenre) :
-            query.includeDemographic;
-        let genreNo = query.excludeGenre ?
-            (query.excludeDemographic ? query.excludeGenre.concat(query.excludeDemographic) : query.excludeGenre) :
-            query.excludeDemographic;
-        let metadata = {
-            'keyword': query.title,
-            'author': query.author || query.artist || '',
-            'status': status,
-            'type': query.includeFormat,
-            'genre': genre,
-            'genreNo': genreNo
-        };
+        let keyword = ((_a = query.title) !== null && _a !== void 0 ? _a : '').replace(/ /g, '_');
+        if (query.author)
+            keyword += ((_b = query.author) !== null && _b !== void 0 ? _b : '').replace(/ /g, '_');
+        let search = `s=all&keyw=${keyword}`;
+        search += `&g_i=${genres}&g_e=${excluded}`;
+        if (status) {
+            search += `&sts=${status}`;
+        }
+        metadata.search = search;
         return createRequestObject({
-            url: `${MK_DOMAIN}/search/story/`,
+            url: `${MK_DOMAIN}/search?`,
+            method: 'GET',
             metadata: metadata,
             headers: {
-                "content-type": "application/x-www-form-urlencoded"
+                "content-type": "application/x-www-form-urlencoded",
             },
-            method: "GET"
+            param: `${search}&page=${metadata.page}`
         });
     }
     // TODO: @getBoolean
     search(data, metadata) {
         var _a, _b, _c;
         let $ = this.cheerio.load(data);
-        let mangaTiles = [];
-        let directory = JSON.parse(((_a = data.match(/vm.Directory = (.*);/)) !== null && _a !== void 0 ? _a : [])[1]);
-        let imgSource = ((_c = (_b = $('.img-fluid').first().attr('src')) === null || _b === void 0 ? void 0 : _b.match(/(.*cover)/)) !== null && _c !== void 0 ? _c : [])[1];
-        if (imgSource !== MK_IMAGE_DOMAIN)
-            MK_IMAGE_DOMAIN = imgSource;
-        directory.forEach((elem) => {
-            let mKeyword = typeof metadata.keyword !== 'undefined' ? false : true;
-            let mAuthor = metadata.author !== '' ? false : true;
-            let mStatus = metadata.status !== '' ? false : true;
-            let mType = typeof metadata.type !== 'undefined' && metadata.type.length > 0 ? false : true;
-            let mGenre = typeof metadata.genre !== 'undefined' && metadata.genre.length > 0 ? false : true;
-            let mGenreNo = typeof metadata.genreNo !== 'undefined' ? true : false;
-            if (!mKeyword) {
-                let allWords = [elem.s.toLowerCase()].concat(elem.al.map((e) => e.toLowerCase()));
-                allWords.forEach((key) => {
-                    if (key.includes(metadata.keyword.toLowerCase()))
-                        mKeyword = true;
-                });
-            }
-            if (!mAuthor) {
-                let authors = elem.a.map((e) => e.toLowerCase());
-                if (authors.includes(metadata.author.toLowerCase()))
-                    mAuthor = true;
-            }
-            if (!mStatus) {
-                if ((elem.ss == 'Ongoing' && metadata.status == 'Ongoing') || (elem.ss != 'Ongoing' && metadata.ss != 'Ongoing'))
-                    mStatus = true;
-            }
-            if (!mType)
-                mType = metadata.type.includes(elem.t);
-            if (!mGenre)
-                mGenre = metadata.genre.every((i) => elem.g.includes(i));
-            if (mGenreNo)
-                mGenreNo = metadata.genreNo.every((i) => elem.g.includes(i));
-            if (mKeyword && mAuthor && mStatus && mType && mGenre && !mGenreNo) {
-                mangaTiles.push(createMangaTile({
-                    id: elem.i,
-                    title: createIconText({ text: elem.s }),
-                    image: `${MK_IMAGE_DOMAIN}/${elem.i}.jpg`,
-                    subtitleText: createIconText({ text: elem.ss })
-                }));
-            }
-        });
-        // Because this parses JSON, there is never any additional search requests to create
+        let panel = $('.panel-content-genres');
+        let manga = [];
+        for (let item of $('.content-genres-item', panel).toArray()) {
+            let id = (_b = (_a = $('.genres-item-name', item).attr('href')) === null || _a === void 0 ? void 0 : _a.split('/').pop()) !== null && _b !== void 0 ? _b : '';
+            let title = $('.genres-item-name', item).text();
+            let subTitle = $('.genres-item-chap', item).text();
+            let image = (_c = $('.img-loading', item).attr('src')) !== null && _c !== void 0 ? _c : '';
+            let rating = $('.genres-item-rate', item).text();
+            let updated = $('.genres-item-time', item).text();
+            manga.push(createMangaTile({
+                id: id,
+                image: image,
+                title: createIconText({ text: title }),
+                subtitleText: createIconText({ text: subTitle }),
+                primaryText: createIconText({ text: rating, icon: 'star.fill' }),
+                secondaryText: createIconText({ text: updated, icon: 'clock.fill' })
+            }));
+        }
+        metadata.page = metadata.page++;
+        let nextPage = this.isLastPage($) ? undefined : {
+            url: `${MN_DOMAIN}/advanced_search?`,
+            method: 'GET',
+            metadata: metadata,
+            headers: {
+                "content-type": "application/x-www-form-urlencoded",
+            },
+            param: `${metadata.search}&page=${metadata.page}`
+        };
         return createPagedResults({
-            results: mangaTiles
+            results: manga,
+            nextPage: nextPage
         });
     }
     // TODO: @getBoolean
