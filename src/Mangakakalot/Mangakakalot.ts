@@ -1,4 +1,4 @@
-import { /*Source,*/ Manga, MangaStatus, Chapter, ChapterDetails, HomeSectionRequest, HomeSection, MangaTile, SearchRequest, LanguageCode, TagSection, Request, MangaUpdates, PagedResults, SourceTag, TagType } from "paperback-extensions-common"
+import { /*Source,*/ Manga, MangaStatus, Chapter, ChapterDetails, HomeSectionRequest, HomeSection, MangaTile, SearchRequest, LanguageCode, TagSection, Request, /*MangaUpdates,*/ PagedResults, SourceTag, TagType } from "paperback-extensions-common"
 import { Manganelo } from '../Manganelo'
 
 const MK_DOMAIN = 'https://mangakakalot.com'
@@ -12,7 +12,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '0.1.30'; }
+  get version(): string { return '0.1.36'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -351,7 +351,7 @@ export class Mangakakalot extends Manganelo {
 
     return createPagedResults({
       results: manga,
-      nextPage: nextPage //manga.length > 0 ? this.constructSearchRequest(metadata.query, metadata.page + 1) : undefined
+      nextPage: nextPage
     });
   }
 
@@ -361,26 +361,7 @@ export class Mangakakalot extends Manganelo {
   // Removed: Mangakakalot does not support searching plus tags @getBoolean
   // getTags(data: any): TagSection[] | null { return null }
 
-  // Done @getBoolean
-  constructGetViewMoreRequest(key: string, page: number) {
-    let metadata = { page: page }
-    let param = ''
-    if (key == 'latest_updates') {
-      param = `/manga_list?type=latest&category=all&state=all&page=${metadata.page}`
-    }
-    else{
-      return undefined
-    }
 
-    return createRequestObject({
-      url: `${MK_DOMAIN}`,
-      method: 'GET',
-      param: param,
-      metadata: {
-        key, page
-      }
-    })
-  }
 
   // Done
   getHomePageSectionRequest(): HomeSectionRequest[] | null {
@@ -388,10 +369,10 @@ export class Mangakakalot extends Manganelo {
       url: `${MK_DOMAIN}`,
       method: 'GET'
     })
-    let request2 = createRequestObject({
+    /*let request2 = createRequestObject({
       url: `${MK_DOMAIN}/manga_list?type=latest&category=all&state=all&page=`,
       method: 'GET'
-    })
+    })*/
     let section1 = createHomeSection({
       id: 'popular_manga',
       title: 'POPULAR MANGA'
@@ -404,12 +385,12 @@ export class Mangakakalot extends Manganelo {
     return [
       createHomeSectionRequest({
         request: request1,
-        sections: [section1/*, section2*/] 
-      }),
+        sections: [section1, section2] 
+      })/*,
       createHomeSectionRequest({
         request: request2,
         sections: [section2]
-      })
+      })*/
     ]
   }
 
@@ -454,7 +435,7 @@ export class Mangakakalot extends Manganelo {
   parseLatestMangaSectionTiles($: CheerioSelector): MangaTile[] {
     let latestManga: MangaTile[] = [];
 
-    /*for (let item of $('.first', '.doreamon').toArray()) {
+    for (let item of $('.first', '.doreamon').toArray()) {
       let url = $('a', item).first().attr('href') ?? ''
       let image = $('img', item).attr('src') ?? ''
 
@@ -464,8 +445,8 @@ export class Mangakakalot extends Manganelo {
         title: createIconText({ text: $('h3', item).text() }),
         subtitleText: createIconText({ text: $('.sts_1', item).first().text() }),
       }))
-    }*/
-    let panel = $('.truyen-list')
+    }
+    /*let panel = $('.truyen-list')
     for (let item of $('.list-truyen-item-wrap', panel).toArray()) {
       let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
       let image = $('img', item).first().attr('src') ?? ''
@@ -477,53 +458,35 @@ export class Mangakakalot extends Manganelo {
         title: createIconText({ text: title }),
         subtitleText: createIconText({ text: subtitle })
       }))
-      }
+    }*/
     return latestManga;
   }
-/*
-    let topManga: MangaTile[] = []
-    let updateManga: MangaTile[] = []
 
-    for (let item of $('.item', '.owl-carousel').toArray()) {
-      let url = $('a', item).first().attr('href') ?? ''
-
-      let image = $('img', item).attr('src') ?? ''
-      let title = $('div.slide-caption', item).children().first().text()
-      let subtitle = $('div.slide-caption', item).children().last().text()
-      topManga.push(createMangaTile({
-        //id: id,
-        id: url,
-        image: image,
-        title: createIconText({ text: title }),
-        subtitleText: createIconText({ text: subtitle })
-      }))
+    // Done @getBoolean
+    constructGetViewMoreRequest(key: string, page: number) {
+      console.log('Invoking constructGetViewMoreRequest() for page ' + page)
+      let metadata = { page: page }
+      let param = ''
+      if (key == 'latest_updates') {
+        param = `/manga_list?type=latest&category=all&state=all&page=${metadata.page}`
+      }
+      else{
+        return undefined
+      }
+  
+      return createRequestObject({
+        url: `${MK_DOMAIN}`,
+        method: 'GET',
+        param: param,
+        metadata: {
+          key, page
+        }
+      })
     }
-
-    for (let item of $('.first', '.doreamon').toArray()) {
-      //let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
-      let url = $('a', item).first().attr('href') ?? ''
-      let image = $('img', item).attr('src') ?? ''
-      //let secondaryText = $('li:nth-child(2) > i', item).text() ?? ''
-
-      updateManga.push(createMangaTile({
-        //id: id,
-        id: url,
-        image: image,
-        title: createIconText({ text: $('h3', item).text() }),
-        subtitleText: createIconText({ text: $('.sts_1', item).first().text() }),
-        //primaryText: createIconText({ text: '', icon: 'star.fill' }),
-        //secondaryText: createIconText({ text: '', icon: 'clock.fill' })
-      }))
-    }
-
-    sections[0].items = topManga
-    sections[1].items = updateManga
-    return sections
-  }*/
 
 
   // TODO: @getBoolean
-  getViewMoreRequest(key: string): Request | undefined {
+  /*getViewMoreRequest(key: string): Request | undefined {
     let metadata = { 'page': 1 }
     let param = ''
     if (key == 'latest_updates') {
@@ -539,17 +502,18 @@ export class Mangakakalot extends Manganelo {
       param: param,
       metadata: metadata
     })
-  }
+  }*/
 
   // TODO: @getBoolean
   getViewMoreItems(data: any, key: string, metadata: any): PagedResults | null {
+    console.log('Invoking getViewMoreItems() for page ' + metadata.page)
     let $ = this.cheerio.load(data)
     let manga: MangaTile[] = []
 
     if (key == 'latest_updates') {
       let panel = $('.truyen-list')
       for (let item of $('.list-truyen-item-wrap', panel).toArray()) {
-        let id = $('a', item).first().attr('href')?.split('/').pop() ?? ''
+        let id = $('a', item).first().attr('href') ?? ''
         let image = $('img', item).first().attr('src') ?? ''
         let title = $('a', item).first().attr('title') ?? ''
         let subtitle = $('.list-story-item-wrap-chapter', item).attr('title') ?? ''
@@ -561,13 +525,14 @@ export class Mangakakalot extends Manganelo {
         }))
       }
     }
-    else return null
-
+    else
+      return null;
+    /*
     //let nextPage: Request | undefined = undefined
     console.log(!this.isLastPage($));
     if (!this.isLastPage($)) {
       metadata.page = ++metadata.page;
-      /*let param = ''
+      let param = ''
       if (key == 'latest_updates') {
         param = `manga_list?type=latest&category=all&state=all&page=${metadata.page}`
       }
@@ -582,12 +547,12 @@ export class Mangakakalot extends Manganelo {
       }
       console.log(nextPage.url);
       console.log(nextPage.method);
-      console.log(nextPage.param);*/
-    }
+      console.log(nextPage.param);
+    }*/
 
     return createPagedResults({
       results: manga,
-      nextPage: manga.length > 0 ? this.constructGetViewMoreRequest(key, metadata.page) : undefined
+      nextPage: manga.length > 0 ? this.constructGetViewMoreRequest(key, metadata.page + 1) : undefined
     });
   }
 
