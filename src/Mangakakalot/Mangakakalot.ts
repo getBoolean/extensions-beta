@@ -117,8 +117,9 @@ export class Mangakakalot extends Manganelo {
     }
 
     // Date
-    let time = new Date($('.manga-info-text li:nth-child(4)').text().replace(/((AM)*(PM)*)/g, '').replace('Last updated : ', '') )
+    let time = new Date($('.manga-info-text li:nth-child(4)').text().replace(/((AM)*(PM)*)/g, '').replace('Last updated : ', ''))
     lastUpdate = time.toDateString()
+    
 
     // Alt Titles
     for (let row of $('li', table).toArray()) {
@@ -205,7 +206,13 @@ export class Mangakakalot extends Manganelo {
       //let volume = Number ( text.includes('Vol.') ? text.slice( text.indexOf('Vol.') + 4, text.indexOf(' ')) : '')
       let name: string = text //text.includes(': ') ? text.slice(text.indexOf(': ') + 2, text.length) : ''
       
-      let time = Date.parse($('span:nth-child(3)', chapter).attr('title') ?? '')
+      let timeString = $('span:nth-child(3)', chapter).attr('title') ?? ''
+      let time: Date
+      if (timeString.includes('a'))
+        time = super.convertTime(timeString)
+      else
+        time = new Date(timeString)
+
       chapters.push(createChapter({
         id: id,
         mangaId: metadata.id,
@@ -220,8 +227,7 @@ export class Mangakakalot extends Manganelo {
     return chapters
   }
 
-  // Need to add headers
-  // TODO @getBoolean
+  // Done @getBoolean
   getChapterDetailsRequest(mangaId: string, chapId: string): Request {
     console.log('in getChapterDetailsRequest()')
     //let mangaIdTemp = mangaId.slice( mangaId.indexOf( '/', mangaId.indexOf('/') + 2 ), mangaId.length )
@@ -230,6 +236,7 @@ export class Mangakakalot extends Manganelo {
     //let tempChapId = chapId.split('/').pop() ?? chapId
     let metadata = {
       'mangaId': mangaId, // mangaId is the full URL
+      // Thanks to @FaizanDurrani for this fix. tempChapId was used instead of chapId
       'chapterId': chapId, // chapId is the full URL
       'nextPage': false,
       'page': 1
@@ -244,7 +251,7 @@ export class Mangakakalot extends Manganelo {
     })
   }
 
-  // TODO @getBoolean
+  // Done @getBoolean
   getChapterDetails(data: any, metadata: any): ChapterDetails {
     console.log('Inside getChapterDetails()')
     //let chapterDetails : ChapterDetails
@@ -259,7 +266,7 @@ export class Mangakakalot extends Manganelo {
     }
   }
 
-  // TODO @getBoolean
+  // Done @getBoolean
   getMangakakalotChapterDetails(data: any, metadata: any): ChapterDetails {
 //  getChapterDetails(data: any, metadata: any): ChapterDetails {
     console.log('In getMangakakalotChapterDetails()')
@@ -281,36 +288,11 @@ export class Mangakakalot extends Manganelo {
 
     //return chapterDetails
   }
-/*
-  // TODO: @getBoolean
-  filterUpdatedMangaRequest(ids: any, time: Date): Request {
-    let metadata = { 'ids': ids, 'referenceTime': time }
-    return createRequestObject({
-      url: `${MK_DOMAIN}/`,
-      metadata: metadata,
-      headers: {
-        "content-type": "application/x-www-form-urlencoded"
-      },
-      method: "GET"
-    })
-  }
 
-  // TODO: @getBoolean
-  filterUpdatedManga(data: any, metadata: any): MangaUpdates {
-    let $ = this.cheerio.load(data)
+  // Removed  filterUpdatedMangaRequest(ids: any, time: Date): Request | null { return null }
 
-    // Because this source parses JSON, there is never any additional pages to parse
-    let returnObject: MangaUpdates = {
-      'ids': []
-    }
-    let updateManga = JSON.parse((data.match(/vm.LatestJSON = (.*);/) ?? [])[1])
-    updateManga.forEach((elem: any) => {
-      if (metadata.ids.includes(elem.IndexName) && metadata.referenceTime < new Date(elem.Date)) returnObject.ids.push(elem.IndexName)
-    })
+  // Removed  filterUpdatedManga(data: any, metadata: any): MangaUpdates | null { return null }
 
-    return createMangaUpdates(returnObject)
-  }
-*/
   // TODO: @getBoolean
   searchRequest(query: SearchRequest): Request | null {
     let status = ""
@@ -525,6 +507,7 @@ export class Mangakakalot extends Manganelo {
   getViewMoreItems(data: any, key: string, metadata: any): PagedResults | null {
     let $ = this.cheerio.load(data)
     let manga: MangaTile[] = []
+
     if (key == 'latest_updates') {
       let panel = $('.truyen-list')
       for (let item of $('.list-truyen-item-wrap', panel).toArray()) {
