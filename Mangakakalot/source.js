@@ -2686,13 +2686,13 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.1.38'; }
+    get version() { return '1.0.0'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
     get authorWebsite() { return 'https://github.com/getBoolean'; }
     get language() { return 'English'; }
-    get description() { return 'Extension that pulls manga from Mangakakalot'; }
+    get description() { return 'Extension that pulls manga from Mangakakalot. Does not support Advanced Search'; }
     get hentaiSource() { return false; }
     getMangaShareUrl(mangaId) {
         /*if ( mangaId.includes('read-')) {
@@ -2706,14 +2706,14 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     get rateLimit() {
         return 2;
     }
-    get sourceTags() {
-        return [
-            {
-                text: "WIP",
-                type: paperback_extensions_common_1.TagType.RED
-            }
-        ];
-    }
+    /*get sourceTags(): SourceTag[] {
+      return [
+        {
+          text: "WIP",
+          type: TagType.RED
+        }
+      ]
+    }*/
     // Done @getBoolean
     getMangaDetailsRequest(ids) {
         let requests = [];
