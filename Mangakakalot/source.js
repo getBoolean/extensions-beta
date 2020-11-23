@@ -2686,7 +2686,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.1.0'; }
+    get version() { return '1.2.0'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2777,17 +2777,18 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         // Genres
         let elems = $('.manga-info-text li:nth-child(7)').find('a').toArray();
         let genres = [];
+        genres = Array.from(elems, x => $(x).text());
         //let ids: string[] = []
-        for (let elem of elems) {
-            let text = $(elem).text();
-            //let id = $(elem).attr('href')?.split('/').pop()?.split('&')[1].replace('category=', '') ?? ''
-            if (text.toLowerCase().includes('smut') || text.toLowerCase().includes('adult')) {
-                hentai = true;
-            }
-            genres.push(text);
-            //ids.push(id)
-        }
-        //tagSections[0].tags.push(createTag({ id: id, label: text }))
+        /*for (let elem of elems) {
+    
+          let text = $(elem).text()
+          //let id = $(elem).attr('href')?.split('/').pop()?.split('&')[1].replace('category=', '') ?? ''
+          if (text.toLowerCase().includes('smut') || text.toLowerCase().includes('adult')) {
+            hentai = true
+          }
+          genres.push(text)
+          //ids.push(id)
+        }*/
         tagSections[0].tags = genres.map((elem) => createTag({ id: elem, label: elem }));
         // Date
         let time = new Date($('.manga-info-text li:nth-child(4)').text().replace(/((AM)*(PM)*)/g, '').replace('Last updated : ', ''));
