@@ -15,7 +15,8 @@ describe('Mangakakalot Tests', function () {
      * Try to choose a manga which is updated frequently, so that the historical checking test can 
      * return proper results, as it is limited to searching 30 days back due to extremely long processing times otherwise.
      */
-    var mangaId = "https://manganelo.com/manga/hj918598";   // Mashle
+    // var mangaId = "https://manganelo.com/manga/hj918598";   // Mashle
+    var mangaId = "https://mangakakalot.com/manga/rm922554";   // Mashle
 
     it("Retrieve Manga Details", async () => {
         let details = await wrapper.getMangaDetails(source, [mangaId]);

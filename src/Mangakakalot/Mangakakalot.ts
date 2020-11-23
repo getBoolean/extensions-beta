@@ -110,8 +110,9 @@ export class Mangakakalot extends Manganelo {
     // Genres
     let elems = $('.manga-info-text li:nth-child(7)').find('a').toArray()
     let genres: string[] = []
+    genres = Array.from(elems, x=>$(x).text() )
     //let ids: string[] = []
-    for (let elem of elems) {
+    /*for (let elem of elems) {
 
       let text = $(elem).text()
       //let id = $(elem).attr('href')?.split('/').pop()?.split('&')[1].replace('category=', '') ?? ''
@@ -120,9 +121,9 @@ export class Mangakakalot extends Manganelo {
       }
       genres.push(text)
       //ids.push(id)
-    }
-    //tagSections[0].tags.push(createTag({ id: id, label: text }))
+    }*/
     tagSections[0].tags = genres.map((elem: string) => createTag({ id: elem, label: elem }))
+    
 
     // Date
     let time = new Date($('.manga-info-text li:nth-child(4)').text().replace(/((AM)*(PM)*)/g, '').replace('Last updated : ', ''))
