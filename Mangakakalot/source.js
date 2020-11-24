@@ -2686,7 +2686,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.2.1'; }
+    get version() { return '1.2.2'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2924,15 +2924,16 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     }
     // Done @getBoolean
     getMangakakalotChapterDetails(data, metadata) {
-        var _a;
         console.log('In getMangakakalotChapterDetails()');
         let $ = this.cheerio.load(data);
-        let pages = [];
-        for (let item of $('img', '.vung-doc').toArray()) {
-            let imageUrl = (_a = $(item).attr('src')) !== null && _a !== void 0 ? _a : '';
-            pages.push(imageUrl);
-            //console.log('Pushing image url: ' + imageUrl)
-        }
+        // let pages: string[] = []
+        let items = $('img', '.vung-doc').toArray();
+        let pages = Array.from(items, x => { var _a; return (_a = $(x).attr('src')) !== null && _a !== void 0 ? _a : ''; });
+        /*for (let item of items) {
+          let imageUrl = $(item).attr('src') ?? ''
+          pages.push(imageUrl)
+          //console.log('Pushing image url: ' + imageUrl)
+        }*/
         return createChapterDetails({
             id: metadata.chapterId,
             mangaId: metadata.mangaId,
@@ -3418,12 +3419,12 @@ class Manganelo extends paperback_extensions_common_1.Source {
         });
     }
     getChapterDetails(data, metadata) {
-        var _a;
         let $ = this.cheerio.load(data);
-        let pages = [];
-        for (let item of $('img', '.container-chapter-reader').toArray()) {
-            pages.push((_a = $(item).attr('src')) !== null && _a !== void 0 ? _a : '');
-        }
+        // let pages: string[] = []
+        let pages = Array.from($('img', '.container-chapter-reader').toArray(), x => { var _a; return (_a = $(x).attr('src')) !== null && _a !== void 0 ? _a : ''; });
+        /*for (let item of $('img', '.container-chapter-reader').toArray()) {
+          pages.push($(item).attr('src') ?? '')
+        }*/
         let chapterDetails = createChapterDetails({
             id: metadata.chapterId,
             mangaId: metadata.mangaId,
