@@ -2686,7 +2686,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.2.0'; }
+    get version() { return '1.2.1'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -2790,6 +2790,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
           //ids.push(id)
         }*/
         tagSections[0].tags = genres.map((elem) => createTag({ id: elem, label: elem }));
+        hentai = (genres.includes('Adult') || genres.includes('Smut')) ? true : false;
         // Date
         let time = new Date($('.manga-info-text li:nth-child(4)').text().replace(/((AM)*(PM)*)/g, '').replace('Last updated : ', ''));
         lastUpdate = time.toDateString();
