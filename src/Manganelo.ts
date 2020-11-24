@@ -192,10 +192,11 @@ export class Manganelo extends Source {
 
   getChapterDetails(data: any, metadata: any): ChapterDetails {
     let $ = this.cheerio.load(data)
-    let pages: string[] = []
-    for (let item of $('img', '.container-chapter-reader').toArray()) {
+    // let pages: string[] = []
+    let pages = Array.from($('img', '.container-chapter-reader').toArray(), x=>$(x).attr('src') ?? '' )
+    /*for (let item of $('img', '.container-chapter-reader').toArray()) {
       pages.push($(item).attr('src') ?? '')
-    }
+    }*/
 
     let chapterDetails = createChapterDetails({
       id: metadata.chapterId,

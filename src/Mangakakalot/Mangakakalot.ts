@@ -12,7 +12,7 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '1.2.1'; }
+  get version(): string { return '1.2.2'; }
   get name(): string { return 'Mangakakalot' }
   get icon(): string { return 'mangakakalot.com.ico' }
   get author(): string { return 'getBoolean' }
@@ -279,12 +279,14 @@ export class Mangakakalot extends Manganelo {
   getMangakakalotChapterDetails(data: any, metadata: any): ChapterDetails {
     console.log('In getMangakakalotChapterDetails()')
     let $ = this.cheerio.load(data)
-    let pages: string[] = []
-    for (let item of $('img', '.vung-doc').toArray()) {
+    // let pages: string[] = []
+    let items = $('img', '.vung-doc').toArray()
+    let pages = Array.from(items, x=>$(x).attr('src') ?? '' )
+    /*for (let item of items) {
       let imageUrl = $(item).attr('src') ?? ''
       pages.push(imageUrl)
       //console.log('Pushing image url: ' + imageUrl)
-    }
+    }*/
 
     return createChapterDetails({
       id: metadata.chapterId,
