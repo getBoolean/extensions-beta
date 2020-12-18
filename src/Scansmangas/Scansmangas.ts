@@ -9,7 +9,7 @@ export class Scansmangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.2' }
+  get version(): string { return '0.0.3' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -432,24 +432,21 @@ export class Scansmangas extends Source {
     return latestManga;
   }
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   constructGetViewMoreRequest(key: string, page: number) {
     console.log('Invoking constructGetViewMoreRequest() for page ' + page);
     console.log('key: ' + key);
-    let param = ''
+    let param = '';
     switch (key) {
-      case 'latest_updates':
-        param = `manga_list?type=latest&category=all&state=all&page=${page}`;
+      case 'latest':
+        param = `page/${page}/`;
         //console.log('param: ' + param);
         break;
-      case 'hot_manga':
-        param = `manga_list?type=topview&category=all&state=all&page=${page}`;
+      case 'popular':
+        param = `tous-nos-mangas/?order=popular`;
         break;
-      case 'new_manga':
-        param = `manga_list?type=newest&category=all&state=all&page=${page}`;
-        break;
-      case 'zcompleted_manga':
-        param = `manga_list?type=newest&category=all&state=Completed&page=${page}`;
+      case 'az':
+        param = `tous-nos-mangas/?order=title`;
         break;
       default:
         return undefined;
@@ -473,16 +470,13 @@ export class Scansmangas extends Source {
     let manga: MangaTile[] = [];
 
     switch (key) {
-      case 'latest_updates':
+      case 'latest':
+        manga = this.parseLatestMangaTiles($);
+        break;
+      case 'popular':
         manga = this.parseMangaSectionTiles($);
         break;
-      case 'hot_manga':
-        manga = this.parseMangaSectionTiles($);
-        break;
-      case 'new_manga':
-        manga = this.parseMangaSectionTiles($);
-        break;
-      case 'zcompleted_manga':
+      case 'az':
         manga = this.parseMangaSectionTiles($);
         break;
       default:
