@@ -359,7 +359,7 @@ export class Scansmangas extends Source {
     ]
   }
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   getHomePageSections(data: any, sections: HomeSection[]): HomeSection[] {
     console.log('Inside getHomePageSections()');
     let $ = this.cheerio.load(data)
@@ -462,7 +462,7 @@ export class Scansmangas extends Source {
   }
 
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   getViewMoreItems(data: any, key: string, metadata: any): PagedResults {
     console.log('Invoking getViewMoreItems() for page ' + metadata.page);
     console.log('key: ' + key);
@@ -489,9 +489,9 @@ export class Scansmangas extends Source {
   }
 
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   /**
-   * Manganelo image requests for older chapters and pages are required to have a referer to it's host
+   * Just in case, headers
    * @param request
    */
   requestModifier(request: Request): Request {
@@ -515,11 +515,12 @@ export class Scansmangas extends Source {
 
 
   
-
+  // Done: @getBoolean
   isLastPage($: CheerioStatic): boolean {
     console.log('Inside isLastPage()');
-    let current = $('.page_select').text();
-    let total = $('.page_last').text();
+    let current = $('.current').text();
+    let pages = $('.pagination').children();
+    let total = $(pages[pages.length-1]).text();
 
     if (current) {
       total = (/(\d+)/g.exec(total) ?? [''])[0];
