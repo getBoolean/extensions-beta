@@ -75,9 +75,8 @@ export class Scansmangas extends Source {
       artist = autart[1];
     }
 
-    let rating = Number($('#rate_row_cmd', table).text().replace('Mangakakalot.com rate : ', '').slice($('#rate_row_cmd', table).text()
-                  .indexOf('Mangakakalot.com rate : '), $('#rate_row_cmd', table).text().indexOf(' / 5')) );
-    let status = $('.manga-info-text li:nth-child(3)').text().split(' ').pop() == 'Ongoing' ? MangaStatus.ONGOING : MangaStatus.COMPLETED;
+    let rating = Number($('.dev-meta-rating').children().first().text().trim());
+    let status = $('.spe span:nth-child(2)').text().replace('Statut: ', '').trim() == 'En cours' ? MangaStatus.ONGOING : MangaStatus.COMPLETED;
     let titles = [title];
     let follows = Number($('#rate_row_cmd', table).text().replace(' votes', '').split(' ').pop() );
     let views = Number($('.manga-info-text li:nth-child(6)').text().replace(/,/g, '').replace('View : ', '') );
