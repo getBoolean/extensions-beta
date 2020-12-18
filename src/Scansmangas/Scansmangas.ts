@@ -62,13 +62,10 @@ export class Scansmangas extends Source {
     let manga: Manga[] = [];
     
     let $ = this.cheerio.load(data);
-    let panel = $('.manga-info-top');
-    let title = $('h1', panel).first().text() ?? '';
     let image = $('.manga-info-pic', panel).children().first().attr('src') ?? '';
     let table = $('.manga-info-text', panel);
     let author = ''; // Updated below
     let artist = ''; // Updated below
-    let autart = $('.manga-info-text li:nth-child(2)').text().replace('Author(s) :', '').replace(/\r?\n|\r/g, '').split(', ');
     autart[autart.length-1] = autart[autart.length-1]?.replace(', ', '');
     author = autart[0];
     if (autart.length > 1 && $(autart[1]).text() != ' ') {
