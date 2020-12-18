@@ -9,19 +9,19 @@ export class Scansmangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.1'; }
-  get name(): string { return 'ScansMangas'; }
-  get icon(): string { return 'icon.png'; }
-  get author(): string { return 'getBoolean'; }
-  get authorWebsite(): string { return 'https://github.com/getBoolean'; }
-  get language(): string { return 'French'; }
-  get description(): string { return 'Extension that pulls manga from ScansMangas.'; }
-  get hentaiSource(): boolean { return false; }
+  get version(): string { return '0.0.1' }
+  get name(): string { return 'ScansMangas' }
+  get icon(): string { return 'icon.png' }
+  get author(): string { return 'getBoolean' }
+  get authorWebsite(): string { return 'https://github.com/getBoolean' }
+  get language(): string { return 'French' }
+  get description(): string { return 'Extension that pulls manga from ScansMangas.' }
+  get hentaiSource(): boolean { return false }
   getMangaShareUrl(mangaId: string): string | null { 
-    return `${SM_DOMAIN}/manga/${mangaId}`;
+    return `${SM_DOMAIN}/manga/${mangaId}`
   }
-  get websiteBaseURL(): string { return SM_DOMAIN; }
-  get rateLimit(): number { return 2; }
+  get websiteBaseURL(): string { return SM_DOMAIN }
+  get rateLimit(): number { return 2 }
   get sourceTags(): SourceTag[] {
     return [
       {
@@ -32,7 +32,7 @@ export class Scansmangas extends Source {
         text: "WIP",
         type: TagType.RED
       }
-    ];
+    ]
   }
 
   // Done: @getBoolean
@@ -60,7 +60,7 @@ export class Scansmangas extends Source {
     console.log('Inside getMangaDetails()');
     
     let manga: Manga[] = [];
-    /*
+    
     let $ = this.cheerio.load(data);
     let panel = $('.manga-info-top');
     let title = $('h1', panel).first().text() ?? '';
@@ -135,7 +135,7 @@ export class Scansmangas extends Source {
       desc: summary,
       hentai: hentai
     }));
-    */
+    
 
     return manga;
   }
@@ -160,7 +160,7 @@ export class Scansmangas extends Source {
   getChapters(data: any, metadata: any): Chapter[] {
     console.log('Inside getChapters()');
     let chapters: Chapter[] = [];
-    /*
+    
     let $ = this.cheerio.load(data);
     let allChapters = $('.chapter-list', '.leftCol');
 
@@ -189,7 +189,7 @@ export class Scansmangas extends Source {
         time: time
       }));
     }
-    */
+    
     return chapters;
   }
 
@@ -224,11 +224,11 @@ export class Scansmangas extends Source {
     // let pages: string[] = [];
     let items = $('img', '.vung-doc').toArray();
     let pages = Array.from(items, x=>$(x).attr('src') ?? '' );
-    /*for (let item of items) {
+    for (let item of items) {
       let imageUrl = $(item).attr('src') ?? '';
       pages.push(imageUrl);
       //console.log('Pushing image url: ' + imageUrl);
-    }*/
+    }
 
     return createChapterDetails({
       id: metadata.chapterId,
@@ -268,7 +268,7 @@ export class Scansmangas extends Source {
     console.log('Inside search()');
     let manga: MangaTile[] = [];
     let $ = this.cheerio.load(data);
-    /*
+    
     let panel = $('.panel_story_list');
     for (let item of $('.story_item', panel).toArray()) {
       let url = $('a', item).first().attr('href') ?? '';
@@ -291,7 +291,7 @@ export class Scansmangas extends Source {
         secondaryText: createIconText({ text: updated, icon: 'clock.fill' })
       }));
     }
-    */
+    
     metadata.page = ++metadata.page;
     let nextPage = this.isLastPage($) ? undefined : {
       url: `${SM_DOMAIN}/`,
@@ -387,7 +387,7 @@ export class Scansmangas extends Source {
   parseLatestMangaTiles($: CheerioSelector): MangaTile[] {
     console.log('Inside parseLatestMangaTiles()');
     let latestManga: MangaTile[] = [];
-    /*
+    
     for (let item of $('.first', '.doreamon').toArray()) {
       let url = $('a', item).first().attr('href') ?? ''
       let image = $('img', item).attr('src') ?? ''
@@ -401,7 +401,7 @@ export class Scansmangas extends Source {
         subtitleText: createIconText({ text: $('.sts_1', item).first().text() }),
       }))
     }
-    */
+    
     return latestManga;
   }
 
@@ -409,7 +409,7 @@ export class Scansmangas extends Source {
   parseMangaSectionTiles($: CheerioSelector): MangaTile[] {
     console.log('Inside parseMangaSectionTiles()');
     let latestManga: MangaTile[] = [];
-    /*
+    
     let panel = $('.truyen-list')
     for (let item of $('.list-truyen-item-wrap', panel).toArray()) {
       let id = $('a', item).first().attr('href') ?? ''
@@ -426,7 +426,7 @@ export class Scansmangas extends Source {
         subtitleText: createIconText({ text: subtitle })
       }));
     }
-    */
+    
     return latestManga;
   }
 
