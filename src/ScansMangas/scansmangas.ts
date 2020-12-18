@@ -14,7 +14,7 @@ export class Mangakakalot extends Source {
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
   get authorWebsite(): string { return 'https://github.com/getBoolean' }
-  get language(): string { return 'English' }
+  get language(): string { return 'French' }
   get description(): string { return 'Extension that pulls manga from ScansMangas.' }
   get hentaiSource(): boolean { return false }
   getMangaShareUrl(mangaId: string): string | null { 
