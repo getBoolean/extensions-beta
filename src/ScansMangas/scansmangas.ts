@@ -3,7 +3,7 @@ import { Source, Manga, MangaStatus, Chapter, ChapterDetails, HomeSectionRequest
 
 const SM_DOMAIN = 'https://scansmangas.xyz'
 
-export class Mangakakalot extends Source {
+export class ScansMangas extends Source {
   constructor(cheerio: CheerioAPI) {
     super(cheerio)
   }
