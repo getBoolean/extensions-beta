@@ -62,15 +62,19 @@ export class Scansmangas extends Source {
     let manga: Manga[] = [];
     
     let $ = this.cheerio.load(data);
-    let image = $('.manga-info-pic', panel).children().first().attr('src') ?? '';
-    let table = $('.manga-info-text', panel);
+    let panel = $('.white');
+    let table = $('.infox', panel);
+    let title = $('h1', table).first().text() ?? '';
+    let image = $('img', panel).attr('src') ?? '';
     let author = ''; // Updated below
     let artist = ''; // Updated below
+    let autart = $('.spe span:nth-child(3)').text().replace('Auteur: ', '').replace('Auteur original : ', '').replace(/\r?\n|\r/g, '').split(', ');
     autart[autart.length-1] = autart[autart.length-1]?.replace(', ', '');
-    author = autart[0];
+    author = autart[0].trim();
     if (autart.length > 1 && $(autart[1]).text() != ' ') {
       artist = autart[1];
     }
+
     let rating = Number($('#rate_row_cmd', table).text().replace('Mangakakalot.com rate : ', '').slice($('#rate_row_cmd', table).text()
                   .indexOf('Mangakakalot.com rate : '), $('#rate_row_cmd', table).text().indexOf(' / 5')) );
     let status = $('.manga-info-text li:nth-child(3)').text().split(' ').pop() == 'Ongoing' ? MangaStatus.ONGOING : MangaStatus.COMPLETED;
@@ -87,7 +91,7 @@ export class Scansmangas extends Source {
     let genres: string[] = [];
     genres = Array.from(elems, x=>$(x).text() );
     tagSections[0].tags = genres.map((elem: string) => createTag({ id: elem, label: elem }));
-    hentai = (genres.includes('Adult') || genres.includes('Smut') ) ? true : false;
+    hentai = genres.includes('Mature') ? true : false;
 
     // Date
     let time = new Date($('.manga-info-text li:nth-child(4)').text().replace(/((AM)*(PM)*)/g, '').replace('Last updated : ', ''));
