@@ -9,7 +9,7 @@ export class Scansmangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.1' }
+  get version(): string { return '0.0.2' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -65,8 +65,6 @@ export class Scansmangas extends Source {
     let panel = $('.manga-info-top');
     let title = $('h1', panel).first().text() ?? '';
     let image = $('.manga-info-pic', panel).children().first().attr('src') ?? '';
-    if (image == '//mangakakalot.com/themes/home/images/404-avatar.png' || image == '')
-          image = 'https://mangakakalot.com/themes/home/images/404-avatar.png';
     let table = $('.manga-info-text', panel);
     let author = ''; // Updated below
     let artist = ''; // Updated below
@@ -383,47 +381,51 @@ export class Scansmangas extends Source {
     });
   }
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   parseLatestMangaTiles($: CheerioSelector): MangaTile[] {
     console.log('Inside parseLatestMangaTiles()');
     let latestManga: MangaTile[] = [];
-    
-    for (let item of $('.first', '.doreamon').toArray()) {
-      let url = $('a', item).first().attr('href') ?? ''
-      let image = $('img', item).attr('src') ?? ''
-      if (image == '//mangakakalot.com/themes/home/images/404-avatar.png' || image == '')
-        image = 'https://mangakakalot.com/themes/home/images/404-avatar.png'
-      //console.log(image)
+    for (let item of $('.utao', '.listupd').toArray()) {
+      let url = $('a', item).first().attr('href') ?? '';
+      let urlSplit = url.split('/');
+      let id = urlSplit[urlSplit.length-2];
+      let image = $('img', item).attr('src') ?? '';
+      let latestChapters = $('.Manga', item);
+      let title = $('a', item).attr('title') ?? ''
+      let subtitle = $('a', latestChapters).first().text().trim()
+      //console.log(image);
+
       latestManga.push(createMangaTile({
-        id: url,
+        id: id,
         image: image,
-        title: createIconText({ text: $('h3', item).text() }),
-        subtitleText: createIconText({ text: $('.sts_1', item).first().text() }),
-      }))
+        title: createIconText({ text: title }),
+        subtitleText: createIconText({ text: subtitle }),
+      }));
     }
     
     return latestManga;
   }
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   parseMangaSectionTiles($: CheerioSelector): MangaTile[] {
     console.log('Inside parseMangaSectionTiles()');
     let latestManga: MangaTile[] = [];
     
-    let panel = $('.truyen-list')
-    for (let item of $('.list-truyen-item-wrap', panel).toArray()) {
-      let id = $('a', item).first().attr('href') ?? ''
-      let image = $('img', item).first().attr('src') ?? ''
-      if (image == '//mangakakalot.com/themes/home/images/404-avatar.png' || image == '')
-        image = 'https://mangakakalot.com/themes/home/images/404-avatar.png'
-      //console.log(image)
-      let title = $('a', item).first().attr('title') ?? ''
-      let subtitle = $('.list-story-item-wrap-chapter', item).attr('title') ?? ''
+    let panel = $('.pads')
+    for (let item of $('.bs', panel).toArray()) {
+      let url = $('a', item).first().attr('href') ?? '';
+      let urlSplit = url.split('/');
+      let id = urlSplit[urlSplit.length-2];
+      let image = $('img', item).first().attr('src') ?? '';
+      let title = $('a', item).attr('title') ?? '';
+      // let subtitle = $('.epxs', item).text() ?? '';
+      //console.log(image);
+
       latestManga.push(createMangaTile({
         id: id,
         image: image,
         title: createIconText({ text: title }),
-        subtitleText: createIconText({ text: subtitle })
+        subtitleText: createIconText({ text: '' })
       }));
     }
     
