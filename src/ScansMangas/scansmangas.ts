@@ -1,34 +1,34 @@
 import { Source, Manga, MangaStatus, Chapter, ChapterDetails, HomeSectionRequest, HomeSection, MangaTile, SearchRequest, LanguageCode, TagSection, Request, /*MangaUpdates,*/ PagedResults, SourceTag, TagType } from "paperback-extensions-common"
 
 
-const SM_DOMAIN = 'https://scansmangas.xyz'
+const SM_DOMAIN = 'https://scansmangas.xyz';
 
-export class ScansMangas extends Source {
+export class Scansmangas extends Source {
   constructor(cheerio: CheerioAPI) {
-    super(cheerio)
+    super(cheerio);
   }
 
   // @getBoolean
   get version(): string { return '0.0.1'; }
-  get name(): string { return 'ScansMangas' }
-  get icon(): string { return 'icon.png' }
-  get author(): string { return 'getBoolean' }
-  get authorWebsite(): string { return 'https://github.com/getBoolean' }
-  get language(): string { return 'French' }
-  get description(): string { return 'Extension that pulls manga from ScansMangas.' }
-  get hentaiSource(): boolean { return false }
+  get name(): string { return 'ScansMangas'; }
+  get icon(): string { return 'icon.png'; }
+  get author(): string { return 'getBoolean'; }
+  get authorWebsite(): string { return 'https://github.com/getBoolean'; }
+  get language(): string { return 'French'; }
+  get description(): string { return 'Extension that pulls manga from ScansMangas.'; }
+  get hentaiSource(): boolean { return false; }
   getMangaShareUrl(mangaId: string): string | null { 
     return `${SM_DOMAIN}/manga/${mangaId}`;
   }
-  get websiteBaseURL(): string { return SM_DOMAIN }
-  get rateLimit(): number { return 2 }
+  get websiteBaseURL(): string { return SM_DOMAIN; }
+  get rateLimit(): number { return 2; }
   get sourceTags(): SourceTag[] {
     return [
       {
         text: "French",
         type: TagType.GREY
       }
-    ]
+    ];
   }
 
   // TODO: @getBoolean

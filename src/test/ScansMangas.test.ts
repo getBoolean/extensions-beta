@@ -1,11 +1,11 @@
 import cheerio from 'cheerio'
 import { APIWrapper, Source } from 'paperback-extensions-common';
-import { ScansMangas } from '../Scansmangas/Scansmangas';
+import { Scansmangas } from '../Scansmangas/Scansmangas';
 
 describe('ScansMangas Tests', function () {
 
     var wrapper: APIWrapper = new APIWrapper();
-    var source: Source = new ScansMangas(cheerio);
+    var source: Source = new Scansmangas(cheerio);
     var chai = require('chai'), expect = chai.expect, should = chai.should();
     var chaiAsPromised = require('chai-as-promised');
     chai.use(chaiAsPromised);
