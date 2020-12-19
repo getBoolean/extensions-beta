@@ -9,7 +9,7 @@ export class ScansMangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.12' }
+  get version(): string { return '0.0.13' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -153,7 +153,8 @@ export class ScansMangas extends Source {
     let chapters: Chapter[] = [];
     
     let $ = this.cheerio.load(data);
-    let allChapters = $('.mCSB_container li').toArray();
+    let chapterContainer = $(".bxcl ul[id='chapter_list']");
+    let allChapters = $('li', chapterContainer).toArray()
     console.log(metadata.url + metadata.id);
 
     for (let chapter of allChapters) {
