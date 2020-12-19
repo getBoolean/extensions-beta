@@ -127,7 +127,7 @@ export class ScansMangas extends Source {
     return manga;
   }
 
-  // Done: @getBoolean
+  // TODO: @getBoolean
   getChaptersRequest(mangaId: string): Request {
     console.log('Inside getChaptersRequest()');
     let metadata = {
@@ -143,7 +143,7 @@ export class ScansMangas extends Source {
    });
   }
 
-  // Done: @getBoolean
+  // TODO: @getBoolean
   getChapters(data: any, metadata: any): Chapter[] {
     console.log('Inside getChapters()');
     let chapters: Chapter[] = [];
@@ -256,7 +256,7 @@ export class ScansMangas extends Source {
       let chapterUrlSplit: string[] = url.split('/');
       let id = chapterUrlSplit[chapterUrlSplit.length-2];
       let title = $('a', item).attr('title') ?? '';
-      let subTitle = $('.epxs', item).text().trim();
+      let subTitle = '' // $('.epxs', item).text().trim();
       let image = $('img',item).attr('src') ?? '';
       let rating = ($('.rating', item).children().last().text().trim());
 
