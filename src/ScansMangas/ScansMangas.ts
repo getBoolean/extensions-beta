@@ -9,7 +9,7 @@ export class ScansMangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.8' }
+  get version(): string { return '0.0.11' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -232,42 +232,43 @@ export class ScansMangas extends Source {
     if (query.author)
       keyword += (query.author ?? '').replace(/ /g, '+');
     let search: string = `${keyword}`;
-    console.log('searchRequest(): ' + `${SM_DOMAIN}/` + `page/${metadata.page}/?s=${search}`);
+    console.log('searchRequest(): ' + `${SM_DOMAIN}/` + `page/${metadata.page}/?s=${search}&post_type=manga`);
     metadata.search = search;
+
     return createRequestObject({
       url: `${SM_DOMAIN}/`,
       method: 'GET',
       metadata: metadata,
-      param: `page/${metadata.page}/?s=${search}`
+      param: `page/${metadata.page}/?s=${search}&post_type=manga`
     });
   }
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   search(data: any, metadata: any): PagedResults | null {
     console.log('Inside search()');
     let manga: MangaTile[] = [];
     let $ = this.cheerio.load(data);
     
-    let panel = $('.panel_story_list');
-    for (let item of $('.story_item', panel).toArray()) {
-      let url = $('a', item).first().attr('href') ?? '';
-      let title = $('.story_name', item).children().first().text();
-      let subTitle = $('.story_chapter', item).first().text().trim();
+    let panel = $('.white');
+    let mangaPanel = $('.trending', panel)
+    for (let item of $('.bs', mangaPanel).toArray()) {
+      let url = $('a', item).attr('href') ?? '';
+      let chapterUrlSplit: string[] = url.split('/');
+      let id = chapterUrlSplit[chapterUrlSplit.length-2];
+      let title = $('a', item).attr('title') ?? '';
+      let subTitle = $('.epxs', item).text().trim();
       let image = $('img',item).attr('src') ?? '';
-      //let rating = $('.genres-item-rate', item).text()
-      let time = new Date($('.story_item_right span:nth-child(5)', item).text().replace(/((AM)*(PM)*)/g, '').replace('Updated : ', ''));
-      let updated = time.toDateString();
+      let rating = ($('.rating', item).children().last().text().trim());
 
       //console.log('search(): ')
       //console.log('     url: ' + url)
       //console.log('   image: ' + image)
       manga.push(createMangaTile({
-        id: url,
+        id: id,
         image: image,
         title: createIconText({ text: title }),
         subtitleText: createIconText({ text: subTitle }),
-        //primaryText: createIconText({ text: rating, icon: 'star.fill' }),
-        secondaryText: createIconText({ text: updated, icon: 'clock.fill' })
+        primaryText: createIconText({ text: rating, icon: 'star.fill' }),
       }));
     }
     
