@@ -9,7 +9,7 @@ export class ScansMangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.5' }
+  get version(): string { return '0.0.8' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -94,11 +94,12 @@ export class ScansMangas extends Source {
     hentai = genres.includes('Mature') ? true : false;
 
     // Date
-    let time = new Date(this.getMeta('article:modified_time') ?? '');
+    let dateModified = $("head meta[property='article:modified_time']").attr("content") ?? '';
+    let time = new Date(dateModified);
     lastUpdate = time.toDateString();
     
-    let altTitles = $('.alter', panel).text().trim().split(' / ');
     // Alt Titles
+    let altTitles = $('.alter', panel).text().trim().split(' / ');
     for (let alt of altTitles) {
       titles.push(alt.trim());
     }
@@ -142,28 +143,22 @@ export class ScansMangas extends Source {
    });
   }
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   getChapters(data: any, metadata: any): Chapter[] {
     console.log('Inside getChapters()');
     let chapters: Chapter[] = [];
     
     let $ = this.cheerio.load(data);
-    let allChapters = $('.chapter-list', '.leftCol');
+    let allChapters = $('.mCSB_container li').toArray();
 
     // volume is commented out because it doesn't sort properly.
-    for (let chapter of $('.row', allChapters).toArray()) {
-      let id: string = $('a', chapter).attr('href') ?? '';
-      let text: string = $('a', chapter).text() ?? '';
-      let chNum = Number( id.split('_').pop() );
-      //let volume = Number ( text.includes('Vol.') ? text.slice( text.indexOf('Vol.') + 4, text.indexOf(' ')) : '')
-      let name: string = text; //text.includes(': ') ? text.slice(text.indexOf(': ') + 2, text.length) : ''
-      
-      let timeString = $('span:nth-child(3)', chapter).attr('title') ?? '';
-      let time: Date;
-      if (timeString.includes('a'))
-        time = super.convertTime(timeString.replace('mins', 'minutes').replace('hour', 'hours'));
-      else
-        time = new Date(timeString);
+    for (let chapter of allChapters) {
+      let item = $('.desktop', chapter).first();
+      let chapterUrl: string = item.attr('href') ?? '';
+      let chapterUrlSplit: string[] = chapterUrl.split('/');
+      let id: string = chapterUrlSplit[chapterUrlSplit.length-2];
+      let name: string = item.text();
+      let chNum = Number( name.split(' ').pop() );
 
       chapters.push(createChapter({
         id: id,
@@ -171,8 +166,6 @@ export class ScansMangas extends Source {
         name: name,
         langCode: LanguageCode.ENGLISH,
         chapNum: chNum,
-        //volume: Number.isNaN(volume) ? 0 : volume,
-        time: time
       }));
     }
     
@@ -501,17 +494,7 @@ export class ScansMangas extends Source {
   }
 
 
-  getMeta(metaName: string): string | null{
-    let metas = document.getElementsByTagName('meta');
   
-    for (let i = 0; i < metas.length; i++) {
-      if (metas[i].getAttribute('property') === metaName) {
-        return metas[i].getAttribute('content');
-      }
-    }
-  
-    return '';
-  }
   
   // Done: @getBoolean
   isLastPage($: CheerioStatic): boolean {
