@@ -78,22 +78,22 @@ export class Scansmangas extends Source {
     let rating = Number($('.dev-meta-rating').children().first().text().trim());
     let status = $('.spe span:nth-child(2)').text().replace('Statut: ', '').trim() == 'En cours' ? MangaStatus.ONGOING : MangaStatus.COMPLETED;
     let titles = [title];
-    let follows = Number($('#rate_row_cmd', table).text().replace(' votes', '').split(' ').pop() );
-    let views = Number($('.manga-info-text li:nth-child(6)').text().replace(/,/g, '').replace('View : ', '') );
+    // let follows = Number($('#rate_row_cmd', table).text().replace(' votes', '').split(' ').pop() );
+    // let views = Number($('.manga-info-text li:nth-child(6)').text().replace(/,/g, '').replace('View : ', '') );
     let lastUpdate = ''; // Updated below
     let hentai = false;
 
     let tagSections: TagSection[] = [createTagSection({ id: '0', label: 'genres', tags: [] }), createTagSection({ id: '1', label: 'format', tags: [] })];
 
     // Genres
-    let elems = $('.manga-info-text li:nth-child(7)').find('a').toArray();
+    let elems = $('.spe span:last-child').find('a').toArray();
     let genres: string[] = [];
     genres = Array.from(elems, x=>$(x).text() );
     tagSections[0].tags = genres.map((elem: string) => createTag({ id: elem, label: elem }));
     hentai = genres.includes('Mature') ? true : false;
 
     // Date
-    let time = new Date($('.manga-info-text li:nth-child(4)').text().replace(/((AM)*(PM)*)/g, '').replace('Last updated : ', ''));
+    let time = new Date(this.getMeta('article:modified_time') ?? '');
     lastUpdate = time.toDateString();
     
 
@@ -127,8 +127,8 @@ export class Scansmangas extends Source {
       artist: artist,
       author: author,
       tags: tagSections,
-      views: views,
-      follows: follows,
+      // views: views,
+      // follows: follows,
       lastUpdate: lastUpdate,
       desc: summary,
       hentai: hentai
@@ -513,7 +513,17 @@ export class Scansmangas extends Source {
   }
 
 
-
+  getMeta(metaName: string): string | null{
+    let metas = document.getElementsByTagName('meta');
+  
+    for (let i = 0; i < metas.length; i++) {
+      if (metas[i].getAttribute('property') === metaName) {
+        return metas[i].getAttribute('content');
+      }
+    }
+  
+    return '';
+  }
   
   // Done: @getBoolean
   isLastPage($: CheerioStatic): boolean {
