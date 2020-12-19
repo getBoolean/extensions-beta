@@ -9,7 +9,7 @@ export class Scansmangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.3' }
+  get version(): string { return '0.0.4' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -37,6 +37,7 @@ export class Scansmangas extends Source {
 
   // Done: @getBoolean
   getMangaDetailsRequest(ids: string[]): Request[] {
+    console.log('Inside getMangaDetailsRequest()');
     let requests: Request[] = [];
     for (let id of ids) {
       let metadata = { 
@@ -55,7 +56,7 @@ export class Scansmangas extends Source {
     return requests;
   }
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   getMangaDetails(data: any, metadata: any): Manga[] {
     console.log('Inside getMangaDetails()');
     
@@ -102,14 +103,7 @@ export class Scansmangas extends Source {
       titles.push(alt.trim());
     }
     
-    // Exclude child text: https://www.viralpatel.net/jquery-get-text-element-without-child-element/
-    // Remove line breaks from start and end: https://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
-    let summary = $('#noidungm', $('.leftCol'))
-                    .clone()    //clone the element
-                    .children() //select all the children
-                    .remove()   //remove all the children
-                    .end()  //again go back to selected element
-                    .text().replace(/^\s+|\s+$/g, '');
+    let summary = $('.entry-content-single').text().replace(/^\s+|\s+$/g, '');
     
 
     manga.push(createManga({
