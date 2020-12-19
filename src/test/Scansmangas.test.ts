@@ -1,6 +1,6 @@
 import cheerio from 'cheerio'
 import { APIWrapper, Source } from 'paperback-extensions-common';
-import { Scansmangas } from '../Scansmangas/Scansmangas';
+import { ScansMangas } from '../ScansMangas/ScansMangas';
 
 describe('ScansMangas Tests', function () {
 
