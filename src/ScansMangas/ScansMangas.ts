@@ -175,52 +175,52 @@ export class ScansMangas extends Source {
   // TODO: @getBoolean
   getChapterDetailsRequest(mangaId: string, chapId: string): Request {
     console.log('in getChapterDetailsRequest()')
-    //let mangaIdTemp = mangaId.slice( mangaId.indexOf( '/', mangaId.indexOf('/') + 2 ), mangaId.length )
-    //let mangaCode = chapId.slice( chapId.indexOf('chapter/') + 8, chapId.indexOf('/chapter_'))
-    //let urlDomain = mangaId.replace(mangaIdTemp, '')
-    //let tempChapId = chapId.split('/').pop() ?? chapId
     let metadata = {
-      'mangaId': mangaId, // mangaId is the full URL
-      // Thanks to @FaizanDurrani for this fix. tempChapId was used instead of chapId
-      'chapterId': chapId, // chapId is the full URL
+      'mangaId': mangaId,
+      'chapterId': chapId,
       'nextPage': false,
       'page': 1
     };
-    //console.log('url: ' + `${urlDomain}/chapter/`)
+    //console.log('url: ' + `${urlDomain}/chapId/`)
     //console.log('param: ' + `${mangaCode}/${tempChapId}`)
 
     return createRequestObject({
-      url: `${SM_DOMAIN}/${chapId}`,
+      url: `${SM_DOMAIN}/`,
       method: "GET",
-      metadata: metadata
+      metadata: metadata,
+      param: `${chapId}/`,
     });
   }
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   getChapterDetails(data: any, metadata: any): ChapterDetails {
     console.log('Inside getChapterDetails()');
     let $ = this.cheerio.load(data);
-    // let pages: string[] = [];
-    let items = $('img', '.vung-doc').toArray();
-    let pages = Array.from(items, x=>$(x).attr('src') ?? '' );
-    for (let item of items) {
-      let imageUrl = $(item).attr('src') ?? '';
-      pages.push(imageUrl);
-      //console.log('Pushing image url: ' + imageUrl);
+    let pages: string[] = [];
+
+    // This uses a hardcoded base url, assuming that every image url is structured the same.
+    // ScansMangas has every image on a separate page, so doing this is much faster than
+    // loading every page and grabbing one image
+    let imageBaseUrl = `${SM_DOMAIN}/scans/${metadata.mangaId}/${metadata.chapterId}/`
+    let items = $('a', '.nav_apb').toArray();
+    let item;
+    for (let i = 1; i <= items.length; i++) {
+      item = items[i];
+      pages.push( imageBaseUrl + '/' + Number($(item).text()) + '.jpg');
     }
 
     return createChapterDetails({
       id: metadata.chapterId,
       mangaId: metadata.mangaId,
       pages: pages,
-      longStrip: false
+      longStrip: false,
     });
   }
 
-  // Removed: Mangakakalot does not show the updated date on their updates page @getBoolean
+  // TODO: @getBoolean
   // filterUpdatedMangaRequest(ids: any, time: Date): Request | null { return null }
 
-  // Removed: Mangakakalot does not show the updated date on their updates page @getBoolean
+  // TODO: @getBoolean
   // filterUpdatedManga(data: any, metadata: any): MangaUpdates | null { return null }
 
   // Done: @getBoolean
