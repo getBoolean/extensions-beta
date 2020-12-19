@@ -9,7 +9,7 @@ export class ScansMangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.11' }
+  get version(): string { return '0.0.12' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -40,6 +40,7 @@ export class ScansMangas extends Source {
     console.log('Inside getMangaDetailsRequest()');
     let requests: Request[] = [];
     for (let id of ids) {
+      // console.log(`id: ${id}`);
       let metadata = { 
         'id': id,
         'url': `${SM_DOMAIN}/manga/`,
@@ -106,6 +107,8 @@ export class ScansMangas extends Source {
     
     let summary = $('.entry-content-single').text().replace(/^\s+|\s+$/g, '');
     
+    // MangaID
+    // console.log(`metadata.id: ${metadata.id}`);
 
     manga.push(createManga({
       id: metadata.id,
@@ -130,16 +133,17 @@ export class ScansMangas extends Source {
   // TODO: @getBoolean
   getChaptersRequest(mangaId: string): Request {
     console.log('Inside getChaptersRequest()');
+    // console.log(mangaId);
     let metadata = {
       'url': `${SM_DOMAIN}/manga/`,
       'id': mangaId,
     };
-
+    // console.log(`${SM_DOMAIN}/manga/${mangaId}/`);
     return createRequestObject({
       url: `${SM_DOMAIN}/manga/`,
       metadata: metadata,
       method: 'GET',
-      param: mangaId,
+      param: `${mangaId}/`,
    });
   }
 
@@ -150,13 +154,14 @@ export class ScansMangas extends Source {
     
     let $ = this.cheerio.load(data);
     let allChapters = $('.mCSB_container li').toArray();
+    console.log(metadata.url + metadata.id);
 
-    // volume is commented out because it doesn't sort properly.
     for (let chapter of allChapters) {
       let item = $('.desktop', chapter).first();
-      let chapterUrl: string = item.attr('href') ?? '';
+      let chapterUrl: string = $('a', item).attr('href') ?? '';
       let chapterUrlSplit: string[] = chapterUrl.split('/');
       let id: string = chapterUrlSplit[chapterUrlSplit.length-2];
+      // console.log(id);
       let name: string = item.text();
       let chNum = Number( name.split(' ').pop() );
 
@@ -164,7 +169,7 @@ export class ScansMangas extends Source {
         id: id,
         mangaId: metadata.id,
         name: name,
-        langCode: LanguageCode.ENGLISH,
+        langCode: LanguageCode.FRENCH,
         chapNum: chNum,
       }));
     }
@@ -377,7 +382,7 @@ export class ScansMangas extends Source {
       let title = $('a', item).attr('title') ?? ''
       let subtitle = $('a', latestChapters).first().text().trim()
       //console.log(image);
-
+      // console.log(`id: ${id}`);
       latestManga.push(createMangaTile({
         id: id,
         image: image,
@@ -403,7 +408,7 @@ export class ScansMangas extends Source {
       let title = $('a', item).attr('title') ?? '';
       // let subtitle = $('.epxs', item).text() ?? '';
       //console.log(image);
-
+      // console.log(`id: ${id}`);
       latestManga.push(createMangaTile({
         id: id,
         image: image,
