@@ -17,7 +17,8 @@ describe('ScansMangas Tests', function () {
      */
     // var mangaId = "komi-san-wa-commu-shou-desu";
     // var mangaId = "soul-eater";
-    var mangaId = "shikkaku-mon-no-saikyou-kenja-sekai-saikyou-no-kenja-ga-sara-ni-tsuyokunaru-tame-ni-tensei-shimashita";
+    // var mangaId = "shikkaku-mon-no-saikyou-kenja-sekai-saikyou-no-kenja-ga-sara-ni-tsuyokunaru-tame-ni-tensei-shimashita";
+    var mangaId = "dr-stone";
     
     it("Retrieve Manga Details", async () => {
         let details = await wrapper.getMangaDetails(source, [mangaId]);

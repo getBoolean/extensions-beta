@@ -9,7 +9,7 @@ export class ScansMangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.13' }
+  get version(): string { return '0.0.16' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -155,16 +155,20 @@ export class ScansMangas extends Source {
     let $ = this.cheerio.load(data);
     let chapterContainer = $(".bxcl ul[id='chapter_list']");
     let allChapters = $('li', chapterContainer).toArray()
-    console.log(metadata.url + metadata.id);
+    // console.log(metadata.url + metadata.id);
 
     for (let chapter of allChapters) {
       let item = $('.desktop', chapter).first();
-      let chapterUrl: string = $('a', item).attr('href') ?? '';
-      let chapterUrlSplit: string[] = chapterUrl.split('/');
-      let id: string = chapterUrlSplit[chapterUrlSplit.length-2];
-      // console.log(id);
+      // let chapterUrl: string = $('a', item).attr('href') ?? '';
+      // let chapterUrlSplit: string[] = chapterUrl.split('/');
       let name: string = item.text();
-      let chNum = Number( name.split(' ').pop() );
+      let nameSplit: string[] = name.split(' ')
+      let chNum = Number( nameSplit.pop() );
+      if (Number.isNaN(chNum)) {
+        chNum = Number( nameSplit.pop() );
+      }
+      let id = `${chNum}`;
+      // console.log(id);
 
       chapters.push(createChapter({
         id: id,
@@ -175,7 +179,7 @@ export class ScansMangas extends Source {
       }));
     }
     
-    return chapters;
+    return chapters.reverse();
   }
 
   // Done: @getBoolean
@@ -187,11 +191,12 @@ export class ScansMangas extends Source {
       'nextPage': false,
       'page': 1
     };
-    //console.log('url: ' + `${urlDomain}/chapId/`)
-    //console.log('param: ' + `${mangaCode}/${tempChapId}`)
+    let urlMangaId = `scan-${mangaId.replace('.', '-')}`;
+    console.log('url: ' + `${SM_DOMAIN}/${urlMangaId}/`)
+    console.log('param: ' + `${chapId}/`)
 
     return createRequestObject({
-      url: `${SM_DOMAIN}/`,
+      url: `${SM_DOMAIN}/${urlMangaId}/`,
       method: "GET",
       metadata: metadata,
       param: `${chapId}/`,
@@ -207,12 +212,23 @@ export class ScansMangas extends Source {
     // This uses a hardcoded base url, assuming that every image url is structured the same.
     // ScansMangas has every image on a separate page, so doing this is much faster than
     // loading every page and grabbing one image
-    let imageBaseUrl = `${SM_DOMAIN}/scans/${metadata.mangaId}/${metadata.chapterId}/`
+    let imageBaseUrl = `${SM_DOMAIN}/scans/${metadata.mangaId}/${metadata.chapterId}`
+    console.log(metadata.mangaId);
+    console.log(metadata.chapterId);
     let items = $('a', '.nav_apb').toArray();
     let item;
-    for (let i = 1; i <= items.length; i++) {
+    let imageNumber : Number;
+    let page : string;
+    for (let i = 1; i < items.length; i++) {
       item = items[i];
-      pages.push( imageBaseUrl + '/' + Number($(item).text()) + '.jpg');
+      imageNumber = Number($(item).text());
+      console.log($(item).text());
+      if (!Number.isNaN(imageNumber))
+      {
+        page = `${imageBaseUrl}/${imageNumber}.jpg`
+        console.log(page);
+        pages.push( page );
+      }
     }
 
     return createChapterDetails({
