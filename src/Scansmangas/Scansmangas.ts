@@ -96,17 +96,11 @@ export class Scansmangas extends Source {
     let time = new Date(this.getMeta('article:modified_time') ?? '');
     lastUpdate = time.toDateString();
     
-
+    let altTitles = $('.alter', panel).text().trim().split(' / ');
     // Alt Titles
-    for (let row of $('li', table).toArray()) {
-      if ($(row).find('.story-alternative').length > 0) {
-        let alts = $('h2', table).text().replace('Alternative : ','').split(/,|;/);
-        for (let alt of alts) {
-          titles.push(alt.trim());
-        }
-      }
+    for (let alt of altTitles) {
+      titles.push(alt.trim());
     }
-
     
     // Exclude child text: https://www.viralpatel.net/jquery-get-text-element-without-child-element/
     // Remove line breaks from start and end: https://stackoverflow.com/questions/14572413/remove-line-breaks-from-start-and-end-of-string
