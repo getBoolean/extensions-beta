@@ -172,7 +172,7 @@ export class ScansMangas extends Source {
     return chapters;
   }
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   getChapterDetailsRequest(mangaId: string, chapId: string): Request {
     console.log('in getChapterDetailsRequest()')
     let metadata = {
