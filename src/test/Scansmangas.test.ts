@@ -61,7 +61,7 @@ describe('ScansMangas Tests', function () {
 
     it("Testing search", async () => {
         let testSearch = createSearchRequest({
-            title: 'Boyfriend'
+            title: 'soul'
         });
 
         let search = await wrapper.search(source, testSearch, 1);

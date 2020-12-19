@@ -223,7 +223,7 @@ export class ScansMangas extends Source {
   // TODO: @getBoolean
   // filterUpdatedManga(data: any, metadata: any): MangaUpdates | null { return null }
 
-  // Done: @getBoolean
+  // TODO: @getBoolean
   searchRequest(query: SearchRequest): Request | null {
     console.log('Inside searchRequest()');
     let metadata = { 'page': 1, 'search': '' };
@@ -243,7 +243,7 @@ export class ScansMangas extends Source {
     });
   }
 
-  // Done: @getBoolean
+  // TODO: @getBoolean
   search(data: any, metadata: any): PagedResults | null {
     console.log('Inside search()');
     let manga: MangaTile[] = [];
@@ -256,6 +256,7 @@ export class ScansMangas extends Source {
       let chapterUrlSplit: string[] = url.split('/');
       let id = chapterUrlSplit[chapterUrlSplit.length-2];
       let title = $('a', item).attr('title') ?? '';
+      // Removed subTitle because it was always "Ch."
       let subTitle = '' // $('.epxs', item).text().trim();
       let image = $('img',item).attr('src') ?? '';
       let rating = ($('.rating', item).children().last().text().trim());
