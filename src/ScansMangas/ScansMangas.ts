@@ -223,7 +223,7 @@ export class ScansMangas extends Source {
   // TODO: @getBoolean
   // filterUpdatedManga(data: any, metadata: any): MangaUpdates | null { return null }
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   searchRequest(query: SearchRequest): Request | null {
     console.log('Inside searchRequest()');
     let metadata = { 'page': 1, 'search': '' };
@@ -243,7 +243,7 @@ export class ScansMangas extends Source {
     });
   }
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   search(data: any, metadata: any): PagedResults | null {
     console.log('Inside search()');
     let manga: MangaTile[] = [];
