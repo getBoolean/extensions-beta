@@ -5,7 +5,7 @@ import { ScansMangas } from '../ScansMangas/ScansMangas';
 describe('ScansMangas Tests', function () {
 
     var wrapper: APIWrapper = new APIWrapper();
-    var source: Source = new Scansmangas(cheerio);
+    var source: Source = new ScansMangas(cheerio);
     var chai = require('chai'), expect = chai.expect, should = chai.should();
     var chaiAsPromised = require('chai-as-promised');
     chai.use(chaiAsPromised);
