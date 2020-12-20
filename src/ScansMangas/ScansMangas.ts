@@ -9,7 +9,7 @@ export class ScansMangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.21' }
+  get version(): string { return '0.0.22' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -159,7 +159,7 @@ export class ScansMangas extends Source {
 
     for (let chapter of allChapters) {
       let item = $('.desktop', chapter).first();
-      // let chapterUrl: string = $('a', item).attr('href') ?? '';
+      let chapterUrl: string = $('a', item).attr('href') ?? '';
       // let chapterUrlSplit: string[] = chapterUrl.split('/');
       let name: string = item.text();
       let nameSplit: string[] = name.split(' ')
@@ -167,13 +167,13 @@ export class ScansMangas extends Source {
       if (Number.isNaN(chNum)) {
         chNum = Number( nameSplit.pop() );
       }
-      let id = `${chNum}`;
+      // let id = `${chNum}`;
       // console.log(id);
 
       chapters.push(createChapter({
-        id: id,
+        id: chapterUrl,
         mangaId: metadata.id,
-        name: name,
+        name: name, // createIconText({ text: title }),
         langCode: LanguageCode.FRENCH,
         chapNum: chNum,
       }));
@@ -186,17 +186,18 @@ export class ScansMangas extends Source {
   getChapterDetailsRequest(mangaId: string, chapId: string): Request {
     console.log('in getChapterDetailsRequest()')
     let metadata = {
-      'mangaId': mangaId,
-      'chapterId': chapId,
+      'mangaId': mangaId, // mangaId ex: dr-stone
+      'chapterId': chapId, // chaptId ex: https://scansmangas.xyz/scan-dr-stone-1/
       'nextPage': false,
       'page': 1
     };
     let urlMangaId = `scan-${mangaId.replace('.', '-')}`;
-    console.log('url: ' + `${SM_DOMAIN}/${urlMangaId}/`)
+    // console.log('url: ' + `${SM_DOMAIN}/${urlMangaId}/`)
     // console.log('param: ' + ``)
 
     return createRequestObject({
-      url: `${SM_DOMAIN}/${urlMangaId}-${chapId}/`,
+      // url: `${SM_DOMAIN}/${urlMangaId}-${chapId}/`,
+      url: `${chapId}`,
       method: "GET",
       metadata: metadata,
       // param: ``,
@@ -213,8 +214,8 @@ export class ScansMangas extends Source {
     let firstImage = $('img', panel).attr('src')?.replace(/\r?\n|\r/g, '') ?? ''
     pages.push( firstImage );
     let originalImageName = firstImage.split('/').pop() ?? '';
-    console.log(originalImageName);
-    console.log(pages[0]);
+    // console.log(originalImageName);
+    // console.log(pages[0]);
 
     let imageBaseUrl = firstImage.replace(`/${originalImageName}`, '');
 
@@ -232,11 +233,11 @@ export class ScansMangas extends Source {
       item = items[i];
       imageNumber = Number($(item).text());
       imageName = originalImageName.replace(`1`, `${metadata.chapterId == 1 ? i+1 : i}`);
-      console.log(imageName);
+      // console.log(imageName);
       if (!Number.isNaN(imageNumber))
       {
         page = `${imageBaseUrl}/${imageName}`;
-        console.log(page);
+        // console.log(page);
         pages.push( page );
       }
     }
@@ -466,7 +467,7 @@ export class ScansMangas extends Source {
       default:
         return undefined;
     }
-    console.log(`${SM_DOMAIN}/${param}`)
+    // console.log(`${SM_DOMAIN}/${param}`)
     return createRequestObject({
       url: `${SM_DOMAIN}/${param}`,
       method: 'GET',

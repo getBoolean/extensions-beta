@@ -18,7 +18,8 @@ describe('ScansMangas Tests', function () {
     // var mangaId = "komi-san-wa-commu-shou-desu";
     // var mangaId = "soul-eater";
     // var mangaId = "shikkaku-mon-no-saikyou-kenja-sekai-saikyou-no-kenja-ga-sara-ni-tsuyokunaru-tame-ni-tensei-shimashita";
-    var mangaId = "dr-stone";
+    // var mangaId = "dr-stone";
+    var mangaId = "6000-the-deep-sea-of-madness";
     // var mangaId = "martial-peak";
     
     it("Retrieve Manga Details", async () => {
@@ -53,8 +54,7 @@ describe('ScansMangas Tests', function () {
     it("Get Chapter Details", async () => {
 
         let chapters = await wrapper.getChapters(source, mangaId);
-        console.log(chapters);
-        let data = await wrapper.getChapterDetails(source, mangaId, chapters[178].id);
+        let data = await wrapper.getChapterDetails(source, mangaId, chapters[0].id);
 
         expect(data, "No server response").to.exist;
         expect(data, "Empty server response").to.not.be.empty;
