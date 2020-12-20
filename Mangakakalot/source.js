@@ -490,7 +490,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.2.2'; }
+    get version() { return '1.2.3'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }

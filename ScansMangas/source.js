@@ -486,7 +486,7 @@ class ScansMangas extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.0.22'; }
+    get version() { return '1.0.0'; }
     get name() { return 'ScansMangas'; }
     get icon() { return 'icon.png'; }
     get author() { return 'getBoolean'; }
