@@ -33,14 +33,14 @@ export class Mangakakalot extends Manganelo {
     return 2
   }
 
-  /*get sourceTags(): SourceTag[] {
+  get sourceTags(): SourceTag[] {
     return [
       {
-        text: "WIP",
-        type: TagType.RED
+        text: "English",
+        type: TagType.GREY
       }
     ]
-  }*/
+  }
 
   // Done @getBoolean
   getMangaDetailsRequest(ids: string[]): Request[] {
