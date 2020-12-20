@@ -241,33 +241,6 @@ export class ScansMangas extends Source {
       }
     }
 
-
-
-
-
-
-
-
-    // This uses a hardcoded base url, assuming that every image url is structured the same.
-    // ScansMangas has every image on a separate page, so doing this is much faster than
-    // loading every page and grabbing one image
-    // console.log(metadata.mangaId);
-    // console.log(metadata.chapterId);
-    // for (let i = metadata.chapterId == 1 ? 1 : 2; i < items.length; i++) {
-    //   // prevItem = items[i-1];
-    //   item = items[i];
-    //   // prevImageNumber = Number($(prevItem).text());
-    //   imageNumber = Number($(item).text());
-    //   imageName = imageName.replace(`${metadata.chapterId == 1 ? i : i-1}`, `${metadata.chapterId == 1 ? i+1 : i}`);
-    //   console.log(imageName);
-    //   if (!Number.isNaN(imageNumber))
-    //   {
-    //     page = `${imageBaseUrl}/${imageName}`;
-    //     console.log(page);
-    //     pages.push( page );
-    //   }
-    // }
-
     return createChapterDetails({
       id: metadata.chapterId,
       mangaId: metadata.mangaId,
