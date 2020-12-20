@@ -9,7 +9,7 @@ export class ScansMangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '0.0.16' }
+  get version(): string { return '0.0.21' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -130,7 +130,7 @@ export class ScansMangas extends Source {
     return manga;
   }
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   getChaptersRequest(mangaId: string): Request {
     console.log('Inside getChaptersRequest()');
     // console.log(mangaId);
@@ -147,7 +147,7 @@ export class ScansMangas extends Source {
    });
   }
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   getChapters(data: any, metadata: any): Chapter[] {
     console.log('Inside getChapters()');
     let chapters: Chapter[] = [];
@@ -193,43 +193,80 @@ export class ScansMangas extends Source {
     };
     let urlMangaId = `scan-${mangaId.replace('.', '-')}`;
     console.log('url: ' + `${SM_DOMAIN}/${urlMangaId}/`)
-    console.log('param: ' + `${chapId}/`)
+    // console.log('param: ' + ``)
 
     return createRequestObject({
-      url: `${SM_DOMAIN}/${urlMangaId}/`,
+      url: `${SM_DOMAIN}/${urlMangaId}-${chapId}/`,
       method: "GET",
       metadata: metadata,
-      param: `${chapId}/`,
+      // param: ``,
     });
   }
 
-  // Done: @getBoolean
+  // TODO: @getBoolean
   getChapterDetails(data: any, metadata: any): ChapterDetails {
     console.log('Inside getChapterDetails()');
     let $ = this.cheerio.load(data);
+    // console.log(data);
     let pages: string[] = [];
+    let panel = $('.postbody');
+    let firstImage = $('img', panel).attr('src')?.replace(/\r?\n|\r/g, '') ?? ''
+    pages.push( firstImage );
+    let originalImageName = firstImage.split('/').pop() ?? '';
+    console.log(originalImageName);
+    console.log(pages[0]);
 
-    // This uses a hardcoded base url, assuming that every image url is structured the same.
-    // ScansMangas has every image on a separate page, so doing this is much faster than
-    // loading every page and grabbing one image
-    let imageBaseUrl = `${SM_DOMAIN}/scans/${metadata.mangaId}/${metadata.chapterId}`
-    console.log(metadata.mangaId);
-    console.log(metadata.chapterId);
+    let imageBaseUrl = firstImage.replace(`/${originalImageName}`, '');
+
+
     let items = $('a', '.nav_apb').toArray();
+    let prevItem;
     let item;
+    let prevImageNumber : Number;
     let imageNumber : Number;
     let page : string;
-    for (let i = 1; i < items.length; i++) {
+    let imageName : string;
+
+    // Loop starting from the second image
+    for (let i = metadata.chapterId == 1 ? 1 : 2; i < items.length; i++) {
       item = items[i];
       imageNumber = Number($(item).text());
-      console.log($(item).text());
+      imageName = originalImageName.replace(`1`, `${metadata.chapterId == 1 ? i+1 : i}`);
+      console.log(imageName);
       if (!Number.isNaN(imageNumber))
       {
-        page = `${imageBaseUrl}/${imageNumber}.jpg`
+        page = `${imageBaseUrl}/${imageName}`;
         console.log(page);
         pages.push( page );
       }
     }
+
+
+
+
+
+
+
+
+    // This uses a hardcoded base url, assuming that every image url is structured the same.
+    // ScansMangas has every image on a separate page, so doing this is much faster than
+    // loading every page and grabbing one image
+    // console.log(metadata.mangaId);
+    // console.log(metadata.chapterId);
+    // for (let i = metadata.chapterId == 1 ? 1 : 2; i < items.length; i++) {
+    //   // prevItem = items[i-1];
+    //   item = items[i];
+    //   // prevImageNumber = Number($(prevItem).text());
+    //   imageNumber = Number($(item).text());
+    //   imageName = imageName.replace(`${metadata.chapterId == 1 ? i : i-1}`, `${metadata.chapterId == 1 ? i+1 : i}`);
+    //   console.log(imageName);
+    //   if (!Number.isNaN(imageNumber))
+    //   {
+    //     page = `${imageBaseUrl}/${imageName}`;
+    //     console.log(page);
+    //     pages.push( page );
+    //   }
+    // }
 
     return createChapterDetails({
       id: metadata.chapterId,
