@@ -510,14 +510,14 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     get rateLimit() {
         return 2;
     }
-    /*get sourceTags(): SourceTag[] {
-      return [
-        {
-          text: "WIP",
-          type: TagType.RED
-        }
-      ]
-    }*/
+    get sourceTags() {
+        return [
+            {
+                text: "English",
+                type: paperback_extensions_common_1.TagType.GREY
+            }
+        ];
+    }
     // Done @getBoolean
     getMangaDetailsRequest(ids) {
         let requests = [];
