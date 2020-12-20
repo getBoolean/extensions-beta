@@ -505,10 +505,6 @@ class ScansMangas extends paperback_extensions_common_1.Source {
                 text: "French",
                 type: paperback_extensions_common_1.TagType.GREY
             },
-            {
-                text: "WIP",
-                type: paperback_extensions_common_1.TagType.RED
-            }
         ];
     }
     // Done: @getBoolean
