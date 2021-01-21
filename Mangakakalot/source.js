@@ -490,7 +490,7 @@ class Mangakakalot extends Manganelo_1.Manganelo {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.2.3'; }
+    get version() { return '1.2.4'; }
     get name() { return 'Mangakakalot'; }
     get icon() { return 'mangakakalot.com.ico'; }
     get author() { return 'getBoolean'; }
@@ -730,14 +730,9 @@ class Mangakakalot extends Manganelo_1.Manganelo {
     getMangakakalotChapterDetails(data, metadata) {
         console.log('In getMangakakalotChapterDetails()');
         let $ = this.cheerio.load(data);
-        // let pages: string[] = []
-        let items = $('img', '.vung-doc').toArray();
+        // Mangakakalot updated their reader, '.vung-doc' is now '.container-chapter-reader'
+        let items = $('img', '.container-chapter-reader').toArray();
         let pages = Array.from(items, x => { var _a; return (_a = $(x).attr('src')) !== null && _a !== void 0 ? _a : ''; });
-        /*for (let item of items) {
-          let imageUrl = $(item).attr('src') ?? ''
-          pages.push(imageUrl)
-          //console.log('Pushing image url: ' + imageUrl)
-        }*/
         return createChapterDetails({
             id: metadata.chapterId,
             mangaId: metadata.mangaId,
