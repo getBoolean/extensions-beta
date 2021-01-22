@@ -900,9 +900,6 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
         let $ = this.cheerio.load(data);
         let manga = [];
         switch (key) {
-            case 'popularUpdates':
-                manga = this.parsePopularMangaTiles($);
-                break;
             case 'zAll':
                 manga = this.parseAllMangaTiles($);
                 break;
