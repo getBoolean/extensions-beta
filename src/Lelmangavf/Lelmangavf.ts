@@ -478,9 +478,6 @@ export class Lelmangavf extends Source {
     let manga: MangaTile[] = [];
 
     switch (key) {
-      case 'popularUpdates':
-        manga = this.parsePopularMangaTiles($);
-        break;
       case 'zAll':
         manga = this.parseAllMangaTiles($);
         break;
