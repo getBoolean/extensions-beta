@@ -486,7 +486,7 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.0.16'; }
+    get version() { return '0.0.19'; }
     get name() { return 'Lelmangavf'; }
     get icon() { return 'icon.ico'; }
     get author() { return 'getBoolean'; }
@@ -602,19 +602,19 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
     }
     // Done: @getBoolean
     getChapters(data, metadata) {
-        var _a, _b, _c;
+        var _a, _b;
         console.log('Inside getChapters()');
         console.log(`metadata.url: ${metadata.url}`);
         console.log(`metadata.id: ${metadata.id}`);
         let chapters = [];
         let $ = this.cheerio.load(data);
-        let panel = $('.row').first();
-        let title = (_a = $('.widget-title', panel).first().text()) !== null && _a !== void 0 ? _a : '';
+        // let panel = $('.row').first();
+        // let title = $('.widget-title', panel).first().text() ?? '';
         let allChapters = $('.chapters .chapter-title-rtl').toArray();
         // console.log(metadata.url + metadata.id);
         for (let chapter of allChapters) {
             let item = $(chapter);
-            let chapterUrl = (_b = $('a', item).attr('href')) !== null && _b !== void 0 ? _b : '';
+            let chapterUrl = (_a = $('a', item).attr('href')) !== null && _a !== void 0 ? _a : '';
             // console.log(`item.text(): ${item.text().replace(/\r?\n|\r/g, '').trim()}`);
             // let name: string = item.text().replace(/\r?\n|\r/g, '').trim().split(' :').pop() ?? '';
             let name = item.text().replace(/\r?\n|\r/g, '').trim();
@@ -627,7 +627,7 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
                 chNum = -9999;
             }
             // console.log(id);
-            let timeString = (_c = $('.chapters .date-chapter-title-rtl').first().text().trim()) !== null && _c !== void 0 ? _c : '';
+            let timeString = (_b = $('.chapters .date-chapter-title-rtl').first().text().trim()) !== null && _b !== void 0 ? _b : '';
             let time;
             if (timeString.includes('a'))
                 time = super.convertTime(timeString.replace('mins', 'minutes').replace('hour', 'hours'));
@@ -748,9 +748,9 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
             title: 'Mises à jour des Manga populaires',
         });
         let section2 = createHomeSection({
-            id: 'all',
+            id: 'zAll',
             title: 'Annuaire des Manga',
-            view_more: this.constructGetViewMoreRequest('all', 1),
+            view_more: this.constructGetViewMoreRequest('zAll', 1),
         });
         let section3 = createHomeSection({
             id: 'recentUpdates',
@@ -781,7 +781,7 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
                 case 'popularUpdates':
                     section.items = this.parsePopularMangaTiles($);
                     break;
-                case 'all':
+                case 'zAll':
                     section.items = this.parseAllMangaTiles($);
                     break;
                 case 'recentUpdates':
@@ -875,10 +875,10 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
         console.log('key: ' + key);
         let param = '';
         switch (key) {
-            case 'all':
+            case 'zAll':
                 param = `scan-manga-list?page=${page}`;
                 break;
-            case 'latestUpdates':
+            case 'recentUpdates':
                 param = `latest-release?page=${page}`;
                 break;
             default:
@@ -903,10 +903,10 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
             case 'popularUpdates':
                 manga = this.parsePopularMangaTiles($);
                 break;
-            case 'all':
+            case 'zAll':
                 manga = this.parseAllMangaTiles($);
                 break;
-            case 'latestUpdates':
+            case 'recentUpdates':
                 manga = this.parseLatestMangaTiles($);
                 break;
             default:
