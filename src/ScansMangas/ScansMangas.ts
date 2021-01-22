@@ -9,7 +9,7 @@ export class ScansMangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '1.0.2' }
+  get version(): string { return '1.0.3' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -396,15 +396,22 @@ export class ScansMangas extends Source {
     console.log('Inside parseLatestMangaTiles()');
     let latestManga: MangaTile[] = [];
     for (let item of $('.utao', '.listupd').toArray()) {
-      let url = $('a', item).first().attr('href') ?? '';
-      let urlSplit = url.split('/');
+      let url = $('a', item).first().attr('href');
+      if (typeof url === 'undefined')
+        continue
+      let urlSplit = url?.split('/');
       let id = urlSplit[urlSplit.length-2];
-      let image = $('img', item).attr('src') ?? '';
+      let image = $('img', item).attr('src');
       let latestChapters = $('.Manga', item);
       let title = $('a', item).attr('title') ?? ''
       let subtitle = $('a', latestChapters).first().text().trim()
       //console.log(image);
       // console.log(`id: ${id}`);
+
+      // Credit to @GameFuzzy
+      // Checks for when no id or image found
+      if (typeof id === 'undefined' || typeof image === 'undefined') 
+        continue
       latestManga.push(createMangaTile({
         id: id,
         image: image,
@@ -423,14 +430,21 @@ export class ScansMangas extends Source {
     
     let panel = $('.pads')
     for (let item of $('.bs', panel).toArray()) {
-      let url = $('a', item).first().attr('href') ?? '';
+      let url = $('a', item).first().attr('href');
+      if (typeof url === 'undefined')
+        continue
       let urlSplit = url.split('/');
       let id = urlSplit[urlSplit.length-2];
-      let image = $('img', item).first().attr('src') ?? '';
+      let image = $('img', item).first().attr('src');
       let title = $('a', item).attr('title') ?? '';
       // let subtitle = $('.epxs', item).text() ?? '';
       //console.log(image);
       // console.log(`id: ${id}`);
+
+      // Credit to @GameFuzzy
+      // Checks for when no id or image found
+      if (typeof id === 'undefined' || typeof image === 'undefined') 
+        continue
       latestManga.push(createMangaTile({
         id: id,
         image: image,
