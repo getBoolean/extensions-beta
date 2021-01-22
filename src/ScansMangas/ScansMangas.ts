@@ -9,7 +9,7 @@ export class ScansMangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '1.0.1' }
+  get version(): string { return '1.0.2' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -200,7 +200,7 @@ export class ScansMangas extends Source {
     });
   }
 
-  // TODO: @getBoolean
+  // Done: @getBoolean
   getChapterDetails(data: any, metadata: any): ChapterDetails {
     console.log('Inside getChapterDetails()');
     let $ = this.cheerio.load(data);
@@ -217,9 +217,7 @@ export class ScansMangas extends Source {
 
 
     let items = $('a', '.nav_apb').toArray();
-    let prevItem;
     let item;
-    let prevImageNumber : Number;
     let imageNumber : Number;
     let page : string;
     let imageName : string;
