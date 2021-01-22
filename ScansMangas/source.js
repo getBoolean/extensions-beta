@@ -486,7 +486,7 @@ class ScansMangas extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.0.1'; }
+    get version() { return '1.0.2'; }
     get name() { return 'ScansMangas'; }
     get icon() { return 'icon.png'; }
     get author() { return 'getBoolean'; }
@@ -654,7 +654,7 @@ class ScansMangas extends paperback_extensions_common_1.Source {
             metadata: metadata,
         });
     }
-    // TODO: @getBoolean
+    // Done: @getBoolean
     getChapterDetails(data, metadata) {
         var _a, _b, _c;
         console.log('Inside getChapterDetails()');
@@ -669,9 +669,7 @@ class ScansMangas extends paperback_extensions_common_1.Source {
         // console.log(pages[0]);
         let imageBaseUrl = firstImage.replace(`/${originalImageName}`, '');
         let items = $('a', '.nav_apb').toArray();
-        let prevItem;
         let item;
-        let prevImageNumber;
         let imageNumber;
         let page;
         let imageName;
