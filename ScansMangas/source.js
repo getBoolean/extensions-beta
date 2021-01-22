@@ -486,7 +486,7 @@ class ScansMangas extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.0.2'; }
+    get version() { return '1.0.3'; }
     get name() { return 'ScansMangas'; }
     get icon() { return 'icon.png'; }
     get author() { return 'getBoolean'; }
@@ -824,19 +824,25 @@ class ScansMangas extends paperback_extensions_common_1.Source {
     }
     // Done: @getBoolean
     parseLatestMangaTiles($) {
-        var _a, _b, _c;
+        var _a;
         console.log('Inside parseLatestMangaTiles()');
         let latestManga = [];
         for (let item of $('.utao', '.listupd').toArray()) {
-            let url = (_a = $('a', item).first().attr('href')) !== null && _a !== void 0 ? _a : '';
-            let urlSplit = url.split('/');
+            let url = $('a', item).first().attr('href');
+            if (typeof url === 'undefined')
+                continue;
+            let urlSplit = url === null || url === void 0 ? void 0 : url.split('/');
             let id = urlSplit[urlSplit.length - 2];
-            let image = (_b = $('img', item).attr('src')) !== null && _b !== void 0 ? _b : '';
+            let image = $('img', item).attr('src');
             let latestChapters = $('.Manga', item);
-            let title = (_c = $('a', item).attr('title')) !== null && _c !== void 0 ? _c : '';
+            let title = (_a = $('a', item).attr('title')) !== null && _a !== void 0 ? _a : '';
             let subtitle = $('a', latestChapters).first().text().trim();
             //console.log(image);
             // console.log(`id: ${id}`);
+            // Credit to @GameFuzzy
+            // Checks for when no id or image found
+            if (typeof id === 'undefined' || typeof image === 'undefined')
+                continue;
             latestManga.push(createMangaTile({
                 id: id,
                 image: image,
@@ -848,19 +854,25 @@ class ScansMangas extends paperback_extensions_common_1.Source {
     }
     // Done: @getBoolean
     parseMangaSectionTiles($) {
-        var _a, _b, _c;
+        var _a;
         console.log('Inside parseMangaSectionTiles()');
         let latestManga = [];
         let panel = $('.pads');
         for (let item of $('.bs', panel).toArray()) {
-            let url = (_a = $('a', item).first().attr('href')) !== null && _a !== void 0 ? _a : '';
+            let url = $('a', item).first().attr('href');
+            if (typeof url === 'undefined')
+                continue;
             let urlSplit = url.split('/');
             let id = urlSplit[urlSplit.length - 2];
-            let image = (_b = $('img', item).first().attr('src')) !== null && _b !== void 0 ? _b : '';
-            let title = (_c = $('a', item).attr('title')) !== null && _c !== void 0 ? _c : '';
+            let image = $('img', item).first().attr('src');
+            let title = (_a = $('a', item).attr('title')) !== null && _a !== void 0 ? _a : '';
             // let subtitle = $('.epxs', item).text() ?? '';
             //console.log(image);
             // console.log(`id: ${id}`);
+            // Credit to @GameFuzzy
+            // Checks for when no id or image found
+            if (typeof id === 'undefined' || typeof image === 'undefined')
+                continue;
             latestManga.push(createMangaTile({
                 id: id,
                 image: image,

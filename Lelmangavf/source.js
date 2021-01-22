@@ -486,7 +486,7 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.0.19'; }
+    get version() { return '0.0.20'; }
     get name() { return 'Lelmangavf'; }
     get icon() { return 'icon.ico'; }
     get author() { return 'getBoolean'; }
@@ -661,14 +661,23 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
     }
     // Done: @getBoolean
     getChapterDetails(data, metadata) {
+        var _a;
         console.log('Inside getChapterDetails()');
         let $ = this.cheerio.load(data);
         // console.log(originalImageName);
         // console.log(pages[0]);
         let items = $('img', '.col-sm-8').toArray();
         items.pop(); // Get rid of extra item
-        let pages = Array.from(items, x => { var _a, _b; return (_b = (_a = $(x).attr('data-src')) === null || _a === void 0 ? void 0 : _a.replace(' //', 'https://').trim()) !== null && _b !== void 0 ? _b : ''; });
-        // let pages: string [] = [];
+        // let pages = Array.from(items, x=>$(x).attr('data-src')?.replace(' //', 'https://').trim() ?? '' )
+        // if (typeof id === 'undefined' || typeof image === 'undefined') continue
+        let pages = [];
+        for (let item of items) {
+            let page = (_a = $(item).attr('data-src')) === null || _a === void 0 ? void 0 : _a.replace(' //', 'https://').trim();
+            // If page is undefined, dont push it
+            if (typeof page === 'undefined')
+                continue;
+            pages.push(page);
+        }
         // // let firstPage = `https://www.lelmangavf.com/uploads/manga/${metadata.mangaId}/chapters/0001/${$(items[0]).attr('alt')?.split(' ').pop()}.jpg`;
         // let firstPage = $(items[0]).attr('data-src') ?? '';
         // firstPage = firstPage.replace(' //', 'https://');
@@ -793,21 +802,24 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
     }
     // Done: @getBoolean
     parsePopularMangaTiles($) {
-        var _a, _b, _c;
         console.log('Inside parsePopularMangaTiles()');
         let latestManga = [];
         let panel = $('.hot-thumbnails');
         let items = $('.span3', panel).toArray();
         for (let item of items) {
-            let url = (_a = $('a', item).first().attr('href')) !== null && _a !== void 0 ? _a : '';
-            let urlSplit = url.split('/');
-            let id = (_b = urlSplit.pop()) !== null && _b !== void 0 ? _b : '';
-            let image = (_c = $('img', item).first().attr('src')) !== null && _c !== void 0 ? _c : '';
-            image = image.replace('//', 'https://');
+            let url = $('a', item).first().attr('href');
+            let urlSplit = url === null || url === void 0 ? void 0 : url.split('/');
+            let id = urlSplit === null || urlSplit === void 0 ? void 0 : urlSplit.pop();
+            let image = $('img', item).first().attr('src');
+            image = image === null || image === void 0 ? void 0 : image.replace('//', 'https://');
             let title = $('.label-warning', item).text().trim();
             let subtitle = $('p', item).text().trim();
             //console.log(image);
             // console.log(`id: ${id}`);
+            // Credit to @GameFuzzy
+            // Checks for when no id or image found
+            if (typeof id === 'undefined' || typeof image === 'undefined')
+                continue;
             latestManga.push(createMangaTile({
                 id: id,
                 image: image,
@@ -819,22 +831,25 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
     }
     // Done: @getBoolean
     parseAllMangaTiles($) {
-        var _a, _b, _c;
         console.log('Inside parsePopularMangaTiles()');
         let latestManga = [];
         let panel = $('.content');
         let items = $('.col-sm-6', panel).toArray();
         for (let item of items) {
-            let url = (_a = $('a', item).first().attr('href')) !== null && _a !== void 0 ? _a : '';
-            let urlSplit = url.split('/');
-            let id = (_b = urlSplit.pop()) !== null && _b !== void 0 ? _b : '';
-            let image = (_c = $('img', item).first().attr('src')) !== null && _c !== void 0 ? _c : '';
-            image = image.replace('//', 'https://');
+            let url = $('a', item).first().attr('href');
+            let urlSplit = url === null || url === void 0 ? void 0 : url.split('/');
+            let id = urlSplit === null || urlSplit === void 0 ? void 0 : urlSplit.pop();
+            let image = $('img', item).first().attr('src');
+            image = image === null || image === void 0 ? void 0 : image.replace('//', 'https://');
             let title = $('.chart-title', item).text().trim();
             let subtitleArray = $('a', item).toArray();
             let subtitle = $(subtitleArray[subtitleArray.length - 1]).text().trim();
             //console.log(image);
             // console.log(`id: ${id}`);
+            // Credit to @GameFuzzy
+            // Checks for when no id or image found
+            if (typeof id === 'undefined' || typeof image === 'undefined')
+                continue;
             latestManga.push(createMangaTile({
                 id: id,
                 image: image,
@@ -846,26 +861,34 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
     }
     // Done: @getBoolean
     parseLatestMangaTiles($) {
-        var _a, _b;
         console.log('Inside parseLatestMangaTiles()');
         let latestManga = [];
+        let allIds = [];
         let panel = $('.mangalist');
         let items = $('.manga-item', panel).toArray();
         for (let item of items) {
-            let url = (_a = $('a', item).first().attr('href')) !== null && _a !== void 0 ? _a : '';
-            let urlSplit = url.split('/');
-            let id = (_b = urlSplit.pop()) !== null && _b !== void 0 ? _b : '';
+            let url = $('a', item).first().attr('href');
+            let urlSplit = url === null || url === void 0 ? void 0 : url.split('/');
+            let id = urlSplit === null || urlSplit === void 0 ? void 0 : urlSplit.pop();
             let image = `${LM_DOMAIN}/uploads/manga/${id}/cover/cover_250x350.jpg`;
             let title = $('a:nth-child(2)', item).text().trim();
             let subtitle = $('a:nth-child(1)', item).first().text().trim();
             // console.log(image);
             // console.log(`id: ${id}`);
-            latestManga.push(createMangaTile({
-                id: id,
-                image: image,
-                title: createIconText({ text: title }),
-                subtitleText: createIconText({ text: subtitle })
-            }));
+            // Credit to @GameFuzzy
+            // Checks for when no id or image found
+            if (typeof id === 'undefined' || typeof image === 'undefined')
+                continue;
+            // Checks for duplicate ids
+            if (!allIds.includes(id)) {
+                latestManga.push(createMangaTile({
+                    id: id,
+                    image: image,
+                    title: createIconText({ text: title }),
+                    subtitleText: createIconText({ text: subtitle })
+                }));
+            }
+            allIds.push(id);
         }
         return latestManga;
     }
