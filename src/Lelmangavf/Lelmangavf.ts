@@ -7,7 +7,7 @@ export class Lelmangavf extends Source {
   constructor(cheerio: CheerioAPI) {
     super(cheerio);
   }
-
+  
   // @getBoolean
   get version(): string { return '0.0.16' }
   get name(): string { return 'Lelmangavf' }
