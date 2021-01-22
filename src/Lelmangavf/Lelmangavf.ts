@@ -9,7 +9,7 @@ export class Lelmangavf extends Source {
   }
   
   // @getBoolean
-  get version(): string { return '0.0.16' }
+  get version(): string { return '0.0.19' }
   get name(): string { return 'Lelmangavf' }
   get icon(): string { return 'icon.ico' }
   get author(): string { return 'getBoolean' }
@@ -147,8 +147,8 @@ export class Lelmangavf extends Source {
     let chapters: Chapter[] = [];
     
     let $ = this.cheerio.load(data);
-    let panel = $('.row').first();
-    let title = $('.widget-title', panel).first().text() ?? '';
+    // let panel = $('.row').first();
+    // let title = $('.widget-title', panel).first().text() ?? '';
     let allChapters = $('.chapters .chapter-title-rtl').toArray()
     // console.log(metadata.url + metadata.id);
 
@@ -308,14 +308,14 @@ export class Lelmangavf extends Source {
       method: 'GET'
     });
 
-    let section1 = createHomeSection({ // Latest chapters (homepage w/ pages)
+    let section1 = createHomeSection({ // Latest chapters (homepage)
       id: 'popularUpdates',
       title: 'Mises à jour des Manga populaires',
     });
     let section2 = createHomeSection({
-      id: 'all',
+      id: 'zAll',
       title: 'Annuaire des Manga',
-      view_more: this.constructGetViewMoreRequest('all', 1),
+      view_more: this.constructGetViewMoreRequest('zAll', 1),
     });
     let section3 = createHomeSection({ // All titles A-Z
       id: 'recentUpdates',
@@ -348,7 +348,7 @@ export class Lelmangavf extends Source {
         case 'popularUpdates':
           section.items = this.parsePopularMangaTiles($);
           break;
-        case 'all':
+        case 'zAll':
           section.items = this.parseAllMangaTiles($);
           break;
         case 'recentUpdates':
@@ -450,10 +450,10 @@ export class Lelmangavf extends Source {
     console.log('key: ' + key);
     let param = '';
     switch (key) {
-      case 'all':
+      case 'zAll':
         param = `scan-manga-list?page=${page}`;
         break;
-      case 'latestUpdates':
+      case 'recentUpdates':
         param = `latest-release?page=${page}`;
         break;
       default:
@@ -481,10 +481,10 @@ export class Lelmangavf extends Source {
       case 'popularUpdates':
         manga = this.parsePopularMangaTiles($);
         break;
-      case 'all':
+      case 'zAll':
         manga = this.parseAllMangaTiles($);
         break;
-      case 'latestUpdates':
+      case 'recentUpdates':
         manga = this.parseLatestMangaTiles($);
         break;
       default:
