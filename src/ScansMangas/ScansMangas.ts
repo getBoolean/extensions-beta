@@ -9,7 +9,7 @@ export class ScansMangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '1.0.4' }
+  get version(): string { return '1.0.6' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -63,6 +63,7 @@ export class ScansMangas extends Source {
     let panel = $('.white');
     let table = $('.infox', panel);
     let title = $('h1', table).first().text() ?? '';
+    title = this.parseString(title);
     let image = $('img', panel).attr('src') ?? '';
     let author = ''; // Updated below
     let artist = ''; // Updated below
@@ -98,11 +99,13 @@ export class ScansMangas extends Source {
     // Alt Titles
     let altTitles = $('.alter', panel).text().trim().split(' / ');
     for (let alt of altTitles) {
+      alt = this.parseString(alt)
       titles.push(alt.trim());
     }
     
     let summary = $('.entry-content-single').text().replace(/^\s+|\s+$/g, '');
-    
+    summary = this.parseString(summary);
+
     // MangaID
     // console.log(`metadata.id: ${metadata.id}`);
 
@@ -169,7 +172,7 @@ export class ScansMangas extends Source {
       chapters.push(createChapter({
         id: chapterUrl,
         mangaId: metadata.id,
-        name: name, // createIconText({ text: title }),
+        name: this.parseString(name), // createIconText({ text: title }),
         langCode: LanguageCode.FRENCH,
         chapNum: chNum,
       }));
@@ -294,8 +297,8 @@ export class ScansMangas extends Source {
       manga.push(createMangaTile({
         id: id,
         image: image,
-        title: createIconText({ text: title }),
-        subtitleText: createIconText({ text: subTitle }),
+        title: createIconText({ text: this.parseString(title) }),
+        subtitleText: createIconText({ text: this.parseString(subTitle) }),
         primaryText: createIconText({ text: rating, icon: 'star.fill' }),
       }));
     }
@@ -415,8 +418,8 @@ export class ScansMangas extends Source {
       latestManga.push(createMangaTile({
         id: id,
         image: image,
-        title: createIconText({ text: title }),
-        subtitleText: createIconText({ text: subtitle }),
+        title: createIconText({ text: this.parseString(title) }),
+        subtitleText: createIconText({ text: this.parseString(subtitle) })
       }));
     }
     
@@ -448,7 +451,7 @@ export class ScansMangas extends Source {
       latestManga.push(createMangaTile({
         id: id,
         image: image,
-        title: createIconText({ text: title }),
+        title: createIconText({ text: this.parseString(title) }),
         subtitleText: createIconText({ text: '' })
       }));
     }
@@ -552,5 +555,14 @@ export class ScansMangas extends Source {
     }
 
     return true;
+  }
+
+
+  // Done: @getBoolean Function to parse strings to fix strings having &#039; instead of "'"
+  parseString(originalString: string): string {
+    let newString = originalString.replace('&#039;', "'");
+    newString = newString.replace('&#8211;', "-");
+
+    return newString;
   }
 }
