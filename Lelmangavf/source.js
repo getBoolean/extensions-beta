@@ -486,7 +486,7 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.0.0'; }
+    get version() { return '1.0.1'; }
     get name() { return 'Lelmangavf'; }
     get icon() { return 'icon.ico'; }
     get author() { return 'getBoolean'; }
@@ -535,6 +535,7 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
         let panel = $('.row').first();
         let table = $('.dl-horizontal', panel).first();
         let title = (_a = $('.widget-title', panel).first().text()) !== null && _a !== void 0 ? _a : '';
+        title = this.parseString(title);
         let image = (_b = $('img', panel).attr('src')) !== null && _b !== void 0 ? _b : '';
         image = image.replace('//', 'https://');
         let author = $('.dl-horizontal dd:nth-child(6)').text().replace(/\r?\n|\r/g, '');
@@ -558,9 +559,11 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
         // Alt Titles
         let altTitles = $('.dl-horizontal dd:nth-child(4)').text().trim().split(', ');
         for (let alt of altTitles) {
+            alt = this.parseString(alt);
             titles.push(alt.trim());
         }
         let summary = $('.well', panel).children().last().text().replace(/^\s+|\s+$/g, '');
+        summary = this.parseString(summary);
         // MangaID
         // console.log(`metadata.id: ${metadata.id}`);
         manga.push(createManga({
@@ -632,7 +635,7 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
             chapters.push(createChapter({
                 id: chapterUrl,
                 mangaId: metadata.id,
-                name: name,
+                name: this.parseString(name),
                 langCode: paperback_extensions_common_1.LanguageCode.FRENCH,
                 chapNum: chNum,
                 time: time,
@@ -720,7 +723,7 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
                 let image = `${LM_DOMAIN}/uploads/manga/${entry.data}/cover/cover_250x350.jpg`;
                 mangaTiles.push(createMangaTile({
                     id: entry.data,
-                    title: createIconText({ text: entry.value }),
+                    title: createIconText({ text: this.parseString(entry.value) }),
                     image: image
                 }));
             }
@@ -819,8 +822,8 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
             latestManga.push(createMangaTile({
                 id: id,
                 image: image,
-                title: createIconText({ text: title }),
-                subtitleText: createIconText({ text: subtitle })
+                title: createIconText({ text: this.parseString(title) }),
+                subtitleText: createIconText({ text: this.parseString(subtitle) })
             }));
         }
         return latestManga;
@@ -849,8 +852,8 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
             latestManga.push(createMangaTile({
                 id: id,
                 image: image,
-                title: createIconText({ text: title }),
-                subtitleText: createIconText({ text: subtitle })
+                title: createIconText({ text: this.parseString(title) }),
+                subtitleText: createIconText({ text: this.parseString(subtitle) })
             }));
         }
         return latestManga;
@@ -883,8 +886,8 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
                 latestManga.push(createMangaTile({
                     id: id,
                     image: image,
-                    title: createIconText({ text: title }),
-                    subtitleText: createIconText({ text: subtitle })
+                    title: createIconText({ text: this.parseString(title) }),
+                    subtitleText: createIconText({ text: this.parseString(subtitle) })
                 }));
                 allIds.push(id);
             }
@@ -975,6 +978,12 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
             return (+total) === (+current);
         }
         return true;
+    }
+    // Done: @getBoolean Function to parse strings to fix strings having &#039; instead of "'"
+    parseString(originalString) {
+        let newString = originalString.replace(/&#039;/g, "'");
+        newString = newString.replace(/&#8211;/g, "-");
+        return newString;
     }
 }
 exports.Lelmangavf = Lelmangavf;

@@ -486,7 +486,7 @@ class ScansMangas extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.0.4'; }
+    get version() { return '1.0.7'; }
     get name() { return 'ScansMangas'; }
     get icon() { return 'icon.png'; }
     get author() { return 'getBoolean'; }
@@ -536,6 +536,7 @@ class ScansMangas extends paperback_extensions_common_1.Source {
         let panel = $('.white');
         let table = $('.infox', panel);
         let title = (_a = $('h1', table).first().text()) !== null && _a !== void 0 ? _a : '';
+        title = this.parseString(title);
         let image = (_b = $('img', panel).attr('src')) !== null && _b !== void 0 ? _b : '';
         let author = ''; // Updated below
         let artist = ''; // Updated below
@@ -566,9 +567,11 @@ class ScansMangas extends paperback_extensions_common_1.Source {
         // Alt Titles
         let altTitles = $('.alter', panel).text().trim().split(' / ');
         for (let alt of altTitles) {
+            alt = this.parseString(alt);
             titles.push(alt.trim());
         }
         let summary = $('.entry-content-single').text().replace(/^\s+|\s+$/g, '');
+        summary = this.parseString(summary);
         // MangaID
         // console.log(`metadata.id: ${metadata.id}`);
         manga.push(createManga({
@@ -628,7 +631,7 @@ class ScansMangas extends paperback_extensions_common_1.Source {
             chapters.push(createChapter({
                 id: chapterUrl,
                 mangaId: metadata.id,
-                name: name,
+                name: this.parseString(name),
                 langCode: paperback_extensions_common_1.LanguageCode.FRENCH,
                 chapNum: chNum,
             }));
@@ -737,8 +740,8 @@ class ScansMangas extends paperback_extensions_common_1.Source {
             manga.push(createMangaTile({
                 id: id,
                 image: image,
-                title: createIconText({ text: title }),
-                subtitleText: createIconText({ text: subTitle }),
+                title: createIconText({ text: this.parseString(title) }),
+                subtitleText: createIconText({ text: this.parseString(subTitle) }),
                 primaryText: createIconText({ text: rating, icon: 'star.fill' }),
             }));
         }
@@ -846,8 +849,8 @@ class ScansMangas extends paperback_extensions_common_1.Source {
             latestManga.push(createMangaTile({
                 id: id,
                 image: image,
-                title: createIconText({ text: title }),
-                subtitleText: createIconText({ text: subtitle }),
+                title: createIconText({ text: this.parseString(title) }),
+                subtitleText: createIconText({ text: this.parseString(subtitle) })
             }));
         }
         return latestManga;
@@ -876,7 +879,7 @@ class ScansMangas extends paperback_extensions_common_1.Source {
             latestManga.push(createMangaTile({
                 id: id,
                 image: image,
-                title: createIconText({ text: title }),
+                title: createIconText({ text: this.parseString(title) }),
                 subtitleText: createIconText({ text: '' })
             }));
         }
@@ -966,6 +969,12 @@ class ScansMangas extends paperback_extensions_common_1.Source {
             return (+total) === (+current);
         }
         return true;
+    }
+    // Done: @getBoolean Function to parse strings to fix strings having &#039; instead of "'"
+    parseString(originalString) {
+        let newString = originalString.replace('&#039;', "'");
+        newString = newString.replace('&#8211;', "-");
+        return newString;
     }
 }
 exports.ScansMangas = ScansMangas;
