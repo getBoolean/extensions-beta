@@ -9,9 +9,9 @@ export class Lelmangavf extends Source {
   }
   
   // @getBoolean
-  get version(): string { return '1.0.1' }
+  get version(): string { return '1.0.2' }
   get name(): string { return 'Lelmangavf' }
-  get icon(): string { return 'icon.ico' }
+  get icon(): string { return 'Lelmangavf.png' }
   get author(): string { return 'getBoolean' }
   get authorWebsite(): string { return 'https://github.com/getBoolean' }
   get language(): string { return 'French' }
