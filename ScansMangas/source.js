@@ -486,7 +486,7 @@ class ScansMangas extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.0.3'; }
+    get version() { return '1.0.4'; }
     get name() { return 'ScansMangas'; }
     get icon() { return 'icon.png'; }
     get author() { return 'getBoolean'; }
@@ -644,7 +644,7 @@ class ScansMangas extends paperback_extensions_common_1.Source {
             'nextPage': false,
             'page': 1
         };
-        let urlMangaId = `scan-${mangaId.replace('.', '-')}`;
+        // let urlMangaId = `scan-${mangaId.replace('.', '-')}`;
         // console.log('url: ' + `${SM_DOMAIN}/${urlMangaId}/`)
         // console.log('param: ' + ``)
         return createRequestObject({
