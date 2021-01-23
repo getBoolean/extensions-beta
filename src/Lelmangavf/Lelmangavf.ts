@@ -9,7 +9,7 @@ export class Lelmangavf extends Source {
   }
   
   // @getBoolean
-  get version(): string { return '1.0.3' }
+  get version(): string { return '1.0.4' }
   get name(): string { return 'Lelmangavf' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -578,8 +578,13 @@ export class Lelmangavf extends Source {
 
   // Done: @getBoolean Function to parse strings to fix strings having &#039; instead of "'"
   parseString(originalString: string): string {
-    let newString = originalString.replace(/&#039;/g, "'");
-    newString = newString.replace(/&#8211;/g, "-");
+    // let newString = originalString.replace(/&#039;/g, "'");
+    // newString = newString.replace(/&#8211;/g, "-");
+
+    // Decode title
+    let newString = originalString.replace(/&#(\d+);/g, function(match, dec) {
+      return String.fromCharCode(dec);
+    })
 
     return newString;
   }
