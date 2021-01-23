@@ -9,7 +9,7 @@ export class ScansMangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '1.0.3' }
+  get version(): string { return '1.0.4' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -187,7 +187,7 @@ export class ScansMangas extends Source {
       'nextPage': false,
       'page': 1
     };
-    let urlMangaId = `scan-${mangaId.replace('.', '-')}`;
+    // let urlMangaId = `scan-${mangaId.replace('.', '-')}`;
     // console.log('url: ' + `${SM_DOMAIN}/${urlMangaId}/`)
     // console.log('param: ' + ``)
 
@@ -218,7 +218,7 @@ export class ScansMangas extends Source {
 
     let items = $('a', '.nav_apb').toArray();
     let item;
-    let imageNumber : Number;
+    let imageNumber : number;
     let page : string;
     let imageName : string;
 
