@@ -28,10 +28,6 @@ export class Lelmangavf extends Source {
         text: "French",
         type: TagType.GREY
       },
-      {
-        text: "WIP",
-        type: TagType.RED
-      },
     ]
   }
 
