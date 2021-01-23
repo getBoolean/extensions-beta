@@ -486,7 +486,7 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '0.0.20'; }
+    get version() { return '0.0.23'; }
     get name() { return 'Lelmangavf'; }
     get icon() { return 'icon.ico'; }
     get author() { return 'getBoolean'; }
@@ -504,10 +504,6 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
             {
                 text: "French",
                 type: paperback_extensions_common_1.TagType.GREY
-            },
-            {
-                text: "WIP",
-                type: paperback_extensions_common_1.TagType.RED
             },
         ];
     }
@@ -859,7 +855,10 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
         }
         return latestManga;
     }
-    // Done: @getBoolean
+    // TODO: @getBoolean (Needs promises) Fix duplicate ids when loading multiple pages. 
+    // Maintain a set as a class variable and reset it everytime 'getViewMoreItems'
+    // is called with null metadata. Check it for duplicate ids
+    // Loading the next page is temp disabled until this is fixed
     parseLatestMangaTiles($) {
         console.log('Inside parseLatestMangaTiles()');
         let latestManga = [];
@@ -887,8 +886,8 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
                     title: createIconText({ text: title }),
                     subtitleText: createIconText({ text: subtitle })
                 }));
+                allIds.push(id);
             }
-            allIds.push(id);
         }
         return latestManga;
     }
@@ -930,6 +929,13 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
                 manga = this.parseLatestMangaTiles($);
                 break;
             default:
+        }
+        // TODO @getBoolean remove this once duplicate ids is fixed
+        // temp disabled next page cause it causes rendering issues with duplicate ids
+        if (key == 'recentUpdates') {
+            return createPagedResults({
+                results: manga,
+            });
         }
         return createPagedResults({
             results: manga,
