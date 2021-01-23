@@ -9,7 +9,7 @@ export class Lelmangavf extends Source {
   }
   
   // @getBoolean
-  get version(): string { return '1.0.0' }
+  get version(): string { return '1.0.1' }
   get name(): string { return 'Lelmangavf' }
   get icon(): string { return 'icon.ico' }
   get author(): string { return 'getBoolean' }
@@ -62,6 +62,7 @@ export class Lelmangavf extends Source {
     let panel = $('.row').first();
     let table = $('.dl-horizontal', panel).first()
     let title = $('.widget-title', panel).first().text() ?? '';
+    title = this.parseString(title);
     let image = $('img', panel).attr('src') ?? '';
     image = image.replace('//', 'https://');
     let author = $('.dl-horizontal dd:nth-child(6)').text().replace(/\r?\n|\r/g, '');
@@ -90,10 +91,12 @@ export class Lelmangavf extends Source {
     // Alt Titles
     let altTitles = $('.dl-horizontal dd:nth-child(4)').text().trim().split(', ');
     for (let alt of altTitles) {
+      alt = this.parseString(alt);
       titles.push(alt.trim());
     }
     
     let summary = $('.well', panel).children().last().text().replace(/^\s+|\s+$/g, '');
+    summary = this.parseString(summary);
     
     // MangaID
     // console.log(`metadata.id: ${metadata.id}`);
@@ -175,7 +178,7 @@ export class Lelmangavf extends Source {
       chapters.push(createChapter({
         id: chapterUrl,
         mangaId: metadata.id,
-        name: name, // createIconText({ text: title }),
+        name: this.parseString(name), // createIconText({ text: title }),
         langCode: LanguageCode.FRENCH,
         chapNum: chNum,
         time: time,
@@ -280,7 +283,7 @@ export class Lelmangavf extends Source {
 
             mangaTiles.push(createMangaTile({
                 id: entry.data,
-                title: createIconText({text: entry.value}),
+                title: createIconText({text: this.parseString(entry.value)}),
                 image: image
             }))
         }
@@ -391,8 +394,8 @@ export class Lelmangavf extends Source {
       latestManga.push(createMangaTile({
         id: id,
         image: image,
-        title: createIconText({ text: title }),
-        subtitleText: createIconText({ text: subtitle })
+        title: createIconText({ text: this.parseString(title) }),
+        subtitleText: createIconText({ text: this.parseString(subtitle) })
       }));
     }
     
@@ -424,8 +427,8 @@ export class Lelmangavf extends Source {
       latestManga.push(createMangaTile({
         id: id,
         image: image,
-        title: createIconText({ text: title }),
-        subtitleText: createIconText({ text: subtitle })
+        title: createIconText({ text: this.parseString(title) }),
+        subtitleText: createIconText({ text: this.parseString(subtitle) })
       }));
     }
     
@@ -462,8 +465,8 @@ export class Lelmangavf extends Source {
         latestManga.push(createMangaTile({
           id: id,
           image: image,
-          title: createIconText({ text: title }),
-          subtitleText: createIconText({ text: subtitle })
+          title: createIconText({ text: this.parseString(title) }),
+          subtitleText: createIconText({ text: this.parseString(subtitle) })
         }));
         allIds.push(id);
       }
@@ -570,5 +573,14 @@ export class Lelmangavf extends Source {
     }
 
     return true;
+  }
+
+
+  // Done: @getBoolean Function to parse strings to fix strings having &#039; instead of "'"
+  parseString(originalString: string): string {
+    let newString = originalString.replace(/&#039;/g, "'");
+    newString = newString.replace(/&#8211;/g, "-");
+
+    return newString;
   }
 }
