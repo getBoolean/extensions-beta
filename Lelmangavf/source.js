@@ -486,7 +486,7 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.0.3'; }
+    get version() { return '1.0.4'; }
     get name() { return 'Lelmangavf'; }
     get icon() { return 'icon.png'; }
     get author() { return 'getBoolean'; }
@@ -981,8 +981,12 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
     }
     // Done: @getBoolean Function to parse strings to fix strings having &#039; instead of "'"
     parseString(originalString) {
-        let newString = originalString.replace(/&#039;/g, "'");
-        newString = newString.replace(/&#8211;/g, "-");
+        // let newString = originalString.replace(/&#039;/g, "'");
+        // newString = newString.replace(/&#8211;/g, "-");
+        // Decode title
+        let newString = originalString.replace(/&#(\d+);/g, function (match, dec) {
+            return String.fromCharCode(dec);
+        });
         return newString;
     }
 }
