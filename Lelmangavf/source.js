@@ -486,9 +486,9 @@ class Lelmangavf extends paperback_extensions_common_1.Source {
         super(cheerio);
     }
     // @getBoolean
-    get version() { return '1.0.2'; }
+    get version() { return '1.0.3'; }
     get name() { return 'Lelmangavf'; }
-    get icon() { return 'Lelmangavf.png'; }
+    get icon() { return 'icon.png'; }
     get author() { return 'getBoolean'; }
     get authorWebsite() { return 'https://github.com/getBoolean'; }
     get language() { return 'French'; }
