@@ -9,7 +9,7 @@ export class Lelmangavf extends Source {
   }
   
   // @getBoolean
-  get version(): string { return '0.0.23' }
+  get version(): string { return '1.0.0' }
   get name(): string { return 'Lelmangavf' }
   get icon(): string { return 'icon.ico' }
   get author(): string { return 'getBoolean' }
