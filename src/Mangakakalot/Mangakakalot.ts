@@ -12,9 +12,9 @@ export class Mangakakalot extends Manganelo {
   }
 
   // @getBoolean
-  get version(): string { return '1.2.5'; }
+  get version(): string { return '1.2.6'; }
   get name(): string { return 'Mangakakalot' }
-  get icon(): string { return 'mangakakalot.com.ico' }
+  get icon(): string { return 'mangakakalot.com.png' }
   get author(): string { return 'getBoolean' }
   get authorWebsite(): string { return 'https://github.com/getBoolean' }
   get language(): string { return 'English' }
