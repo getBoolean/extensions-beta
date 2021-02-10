@@ -9,7 +9,7 @@ export class ScansMangas extends Source {
   }
 
   // @getBoolean
-  get version(): string { return '1.0.8' }
+  get version(): string { return '1.0.9' }
   get name(): string { return 'ScansMangas' }
   get icon(): string { return 'icon.png' }
   get author(): string { return 'getBoolean' }
@@ -27,6 +27,10 @@ export class ScansMangas extends Source {
       {
         text: "French",
         type: TagType.GREY
+      },
+      {
+        text: "Slow",
+        type: TagType.RED
       },
     ]
   }
